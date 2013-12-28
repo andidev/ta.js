@@ -1,0 +1,22 @@
+CACHE MANIFEST
+http://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.js
+http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js
+http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/jquery-ui.css
+http://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.0/jquery.cookie.min.js
+http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js
+http://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js
+http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.1/jquery.flot.min.js
+http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.1/jquery.flot.time.min.js
+http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.1/jquery.flot.selection.min.js
+http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.1/jquery.flot.crosshair.min.js
+http://cdnjs.cloudflare.com/ajax/libs/knockout/3.0.0/knockout-debug.js
+http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.js
+http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap-popover.js
+http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/css/bootstrap.css
+http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.js
+http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.min.css
+http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap-editable/js/bootstrap-editable.js
+http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css
+http://cdnjs.cloudflare.com/ajax/libs/jquery-url-parser/2.3.1/purl.js
+http://cdnjs.cloudflare.com/ajax/libs/log4javascript/1.4.3/log4javascript.js
+http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css

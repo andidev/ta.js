@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" manifest="example.appcache">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+
+        <title>TA</title>
+
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/jquery-ui.css"/>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.0/jquery.cookie.min.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/numeral.js/1.5.2/numeral.min.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.1/jquery.flot.min.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.1/jquery.flot.time.min.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.1/jquery.flot.selection.min.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.1/jquery.flot.crosshair.min.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/knockout/3.0.0/knockout-debug.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.js"></script>
+        <!--<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap-popover.js"></script>-->
+        <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/css/bootstrap.css"/>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.min.css"/>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.min.css"/>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/2.0.0/js/bootstrap-switch.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/2.0.0/css/bootstrap-switch.min.css"/>
+        <script type="text/javascript" src="javascript/bootstrap-slider.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-slider.css"/>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap-editable/js/bootstrap-editable.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css"/>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery-url-parser/2.3.1/purl.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/log4javascript/1.4.3/log4javascript.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css"/>
+        <script type="text/javascript" src="../dist/ta.js"></script>
+        <script type="text/javascript" src="javascript/log4javascript-config.js"></script>
+        <script type="text/javascript" src="javascript/moment-utils.js"></script>
+        <script type="text/javascript" src="javascript/numeral-utils.js"></script>
+        <script type="text/javascript" src="javascript/knockout-utils.js"></script>
+        <script type="text/javascript" src="javascript/yahoo-finance-utils.js"></script>
+        <script type="text/javascript" src="javascript/flot-utils.js"></script>
+        <script type="text/javascript" src="javascript/utils.js"></script>
+        <script type="text/javascript" src="javascript/example.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/example.css"/>
+
+        <script type="text/javascript">
+            $(function() {
+                $('.slider').slider();
+//                $("#from-date").attr("value", viewModel.fromDate().format("yyyy-mm-dd"));
+//                $("#to-date").attr("value", viewModel.toDate().format("yyyy-mm-dd"));
+                $('#from-to-date').datepicker({
+                    format: "yyyy-mm-dd",
+                    todayBtn: "linked",
+                    calendarWeeks: true,
+                    autoclose: true,
+                    todayHighlight: true
+                });
+                $('#from-date-button').on('click', function(ev) {
+                    $('#from-date').datepicker('show');
+                })
+                $('#to-date-button').on('click', function(ev) {
+                    $('#to-date').datepicker('show');
+                })
+
+            });
+        </script>
+
+        <style type="text/css">
+            .flot-tick-label {
+                font-weight: bold;
+                color: #999999;
+            }
+            #plot .flot-y-axis .flot-tick-label {
+                color: #31708f;
+            }
+            .flot-x-axis .flot-tick-label {
+                color: #999999;
+            }
+            #macd-plot .flot-y2-axis .flot-tick-label {
+                color: rgba(56, 174, 17, 0.5);
+            }
+
+        </style>
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+    </head>
+
+    <body data-bind="event: { keydown: keyboardShortcutsHandler, keyup: resetCtrlKeyDown }">
+
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">TA.js<span data-bind="visible: debug"> (DEBUG MODE)</span></a>
+                </div>
+                <div class="collapse navbar-collapse navbar-right">
+                    <ul class="nav navbar-nav">
+                        <li><a href="#">Examples</a></li>
+                        <li><a href="#documentation">Documentation</a></li>
+                        <li><a href="https://github.com/andidev/ta.js"><i class="fa fa-github"></i> GitHub</a></li>
+                        <li><a href="https://github.com/andidev/ta.js/issues/new?labels=bug"><i class="fa fa-bug"></i> Report a Bug</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </div>
+
+        <div class="container">
+
+            <div id="examples" class="row">
+                <h2 data-bind="text: symbolName">Symbol Name</h2>
+                <div class="col-md-12">
+                    <div id="ta-header" class="col-md-12">
+                        <div class="pull-left">
+                            <ul class="list-inline">
+                                <li class="hover-popover" data-content="Percent" data-bind="css: percentColorClass"><i class="fa" data-bind="css: percentArrowClass"></i> <strong data-bind="html: formattedPercent"></strong></li>
+                                <li class="text-info hover-popover" data-content="Highest"><i class="fa fa-chevron-up"></i> <strong data-bind="text: formattedHighest"></strong></li>
+                                <li class="text-info hover-popover" data-content="Lowest"><i class="fa fa-chevron-down text-error"></i> <strong data-bind="text: formattedLowest"></strong></li>
+                            </ul>
+                        </div>
+                        <div class="pull-right">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-link" data-bind="click: undoZoom"><i class="fa fa-reply fa-lg fa-fw"></i></button>
+                                <button type="button" class="btn btn-link" data-bind="click: zoomOut"><i class="fa fa-search-minus fa-lg fa-fw"></i></button>
+                                <button type="button" class="btn btn-link" data-bind="click: zoomIn"><i class="fa fa-search-plus fa-lg fa-fw"></i></button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-link" data-bind="click: panLeft"><i class="fa fa-arrow-left fa-lg fa-fw"></i></button>
+                                <button type="button" class="btn btn-link" data-bind="click: panRight"><i class="fa fa-arrow-right fa-lg fa-fw"></i></button>
+                            </div>
+                            <div class="btn-group">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Scale <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" style="width:200px;">
+                                        <li>
+                                            <a href="#" class="clearfix" data-bind="click: changeScaleToDay">Day <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'day'}"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="clearfix" data-bind="click: changeScaleToWeek">Week <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'week'}"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="clearfix" data-bind="click: changeScaleToMonth">Month <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'month'}"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="clearfix" data-bind="click: changeScaleToYear">Year <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'year'}"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="clearfix" data-bind="click: changeScaleToAuto">Auto <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'auto'}"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">TA <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" style="width:200px;">
+                                        <li>
+                                            <a href="#" class="clearfix" data-bind="click: toggleMa5Ma14"><span data-bind="text: 'MA' + maFastestDatumPoints() + '/' + maFastDatumPoints()">MA5/14</span> <i class="fa pull-right" data-bind="css: {'fa-check': showMa5Ma14(), 'fa-check-w': !showMa5Ma14()}"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="clearfix" data-bind="click: toggleMa50Ma100Ma200">MA50/100/200 <i class="fa pull-right" data-bind="css: {'fa-check': showMa50Ma100Ma200(), 'fa-check-w': !showMa50Ma100Ma200()}"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="clearfix" data-bind="click: toggleMacd">MACD <i class="fa pull-right" data-bind="css: {'fa-check': showMacd()}"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <button type="button" class="btn btn-default" data-bind="click: toggleSettings, css: {active: showSettings()}"><i class="fa fa-cog fa-lg"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ta-plots" class="col-md-12">
+                        <div id="plot" data-bind="event: { plotselected: zoomSelection, plotselecting: syncSelectionInMacdPlot, plothover: showPriceInfo, mouseout: hidePriceInfo, mousewheel: scrollPanZoom}"></div>
+                        <div id="macd-plot" data-bind="event: { plotselected: zoomSelection, plotselecting: syncSelectionInPlot, plothover: showPriceInfo, mouseout: hidePriceInfo}"></div>
+                        <div id="hover-popover" class="popover right"><div class="arrow"></div><div class="popover-content"><span data-bind="css: hoverPopoverPercentColorClass"><i class="fa" data-bind="css: hoverPopoverPercentArrowClass"></i> <strong data-bind="html: hoverPopoverFormattedPercent()"></strong></span> <strong class="text-info" data-bind="text: hoverPopoverFormattedPrice"></strong> <strong class="text-muted" data-bind="text: hoverPopoverFormattedDate"></strong></div></div>
+                        <!--<div id="hover-popover" class="popover right"><div class="arrow" style="top: 35%;"></div><div class="popover-content"><span data-bind="css: hoverPopoverPercentColorClass"><i class="fa" data-bind="css: hoverPopoverPercentArrowClass"></i> <strong data-bind="html: hoverPopoverFormattedPercent()"></strong></span> <strong class="text-info" data-bind="text: hoverPopoverFormattedPrice"></strong></div><h3 style="height: 20px; padding-top: 1px; margin-bottom: 0px; padding-bottom: 0px; border-top: 1px solid #ebebeb; border-bottom: 0px; border-radius: 0 0 5px 5px;" class="popover-title text-muted text-center"><strong class="text-muted" data-bind="text: hoverPopoverFormattedDate"></strong></h3></div>-->
+                    </div>
+                    <div id="ta-footer" class="col-md-12">
+                        <div class="pull-left">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default" data-bind="click: changeTimePeriodToAll, css: {active: timePeriod() === 'all'}">All</button>
+                                <button type="button" class="btn btn-default" data-bind="click: changeTimePeriodTo10Years, css: {active: timePeriod() === '10years'}">10 Years</button>
+                                <button type="button" class="btn btn-default" data-bind="click: changeTimePeriodTo3Years, css: {active: timePeriod() === '3years'}">3 Years</button>
+                                <button type="button" class="btn btn-default" data-bind="click: changeTimePeriodToYear, css: {active: timePeriod() === 'year'}">Year</button>
+                                <button type="button" class="btn btn-default" data-bind="click: changeTimePeriodTo3Months, css: {active: timePeriod() === '3months'}">3 Months</button>
+                                <button type="button" class="btn btn-default" data-bind="click: changeTimePeriodToMonth, css: {active: timePeriod() === 'month'}">Month</button>
+                                <button type="button" class="btn btn-default" data-bind="click: changeTimePeriodToWeek, css: {active: timePeriod() === 'week'}">Week</button>
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <div class="btn-group">
+                                <!--
+                                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                                    <span class="caret"></span>
+                                                                    <span class="sr-only">Toggle Dropdown</span>
+                                                                </button>
+                                                                <ul class="dropdown-menu" role="menu" style="width:200px;">
+                                                                    <li><a href="#" data-sbind="click: changeFromTimeToAll">All</a></li>
+                                                                    <li><a href="#" data-sbind="click: changeFromTimeTo3Years">3 Years Ago</a></li>
+                                                                    <li><a href="#" data-sbind="click: changeFromTimeToYear">A Year Ago</a></li>
+                                                                    <li><a href="#" data-sbind="click: changeFromTimeTo3Months">3 Months Ago</a></li>
+                                                                    <li><a href="#" data-sbind="click: changeFromTimeToMonth">A Month Ago</a></li>
+                                                                    <li><a href="#" data-sbind="click: changeFromTimeToWeek">A Week Ago</a></li>
+                                                                </ul>
+                                -->
+                                <div id="from-to-date" class="input-daterange input-group">
+                                    <a id="from-date-button" class="btn btn-default form-control" data-bind="text: formattedFromDate()"></a>
+                                    <input id="from-date" type="text" class="btn btn-default form-control" name="start" data-bind="event: {changeDate: changeFromDate}"/>
+                                    <span class="input-group-addon">to</span>
+                                    <input id="to-date" type="text" class="btn btn-default form-control" name="end" data-bind="event: {changeDate: changeToDate}"/>
+                                    <a id="to-date-button" class="btn btn-default form-control" data-bind="text: formattedToDate()"></a>
+                                </div>
+                                <!--
+                                                                <div id="from-to-date" class="input-daterange input-group" style="width: 250px;">
+                                                                    <input type="text" class="btn btn-default form-control" name="start" data-bind="value: formatDate(fromDate())"/>
+                                                                    <span class="input-group-addon">to</span>
+                                                                    <input type="text" class="btn btn-default form-control" name="end" data-bind="value: formatDate(toDate())"/>
+                                                                </div>
+                                -->
+                            </div>
+                            <!--
+                                                      <input id="from-date" class="btn btn-default" type="button" type="text" class="form-control" data-bind="value: xaxisMinDate().toString('yyyy-MM-dd')"/>
+                                                      <input id="to-date" class="btn btn-default" type="button" type="text" class="form-control" data-bind="value: xaxisMaxDate().toString('yyyy-MM-dd')"/>
+                            -->
+                        </div>
+                    </div>
+                </div>
+                <div id="settings" class="col-md-4" data-bind="visibleSlideRight: showSettings()">
+                    <div class="row">
+                        <div class="panel panel-default">
+                            <div class="panel-heading clearfix">
+                                <h3 class="panel-title pull-left">Settings</h3>
+                                <button class="pull-right btn btn-default btn-xs" data-bind="click: toggleSettings"><i class="fa fa-times"></i></button>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-horizontal" role="form">
+                                    <div class="form-group">
+                                        <label for="symbol" class="col-sm-3 pull-left">Symbol</label>
+                                        <div class="col-sm-9">
+                                            <input id="symbol" class="pull-right"/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="scale" class="col-sm-3 pull-left">Scale</label>
+                                        <div class="col-sm-9">
+                                            <div class="btn-group pull-right">
+                                                <button type="button" class="btn btn-default btn-xs" data-bind="click: changeScaleToDay, css: {active: scale() === 'day'}">Day</button>
+                                                <button type="button" class="btn btn-default btn-xs" data-bind="click: changeScaleToWeek, css: {active: scale() === 'week'}">Week</button>
+                                                <button type="button" class="btn btn-default btn-xs" data-bind="click: changeScaleToMonth, css: {active: scale() === 'month'}">Month</button>
+                                                <button type="button" class="btn btn-default btn-xs" data-bind="click: changeScaleToYear, css: {active: scale() === 'year'}">Yeer</button>
+                                                <button type="button" class="btn btn-default btn-xs" data-bind="click: changeScaleToAuto, css: {active: scale() === 'auto'}">Auto</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="ma5-14" class="col-sm-3 pull-left">Split Detection</label>
+                                        <div class="col-sm-9">
+                                            <button id="ma5-14" class="pull-right btn btn-default btn-xs col-md-2" data-bind="click: toggleSplitDetection, text: enableSplitDetection() ? 'Disable' : 'Enable'"></button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="ma5-14" class="col-sm-3 pull-left" data-bind="text: 'MA' + maFastestDatumPoints() + '/' + maFastDatumPoints()">MA5/14</label>
+                                        <div class="col-sm-9">
+                                            <button id="ma5-14" class="pull-right btn btn-default btn-xs col-md-2" data-bind="click: toggleMa5Ma14, text: showMa5Ma14() ? 'Hide' : 'Show'"></button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="ma50-100-200" class="col-sm-3 pull-left">MA50/100/200</label>
+                                        <div class="col-sm-9">
+                                            <button id="ma50-100-200" class="pull-right btn btn-default btn-xs col-md-2" data-bind="click: toggleMa50Ma100Ma200, text: showMa50Ma100Ma200() ? 'Hide' : 'Show'"></button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="macd" class="col-sm-3 pull-left">MACD</label>
+                                        <div class="col-sm-9">
+                                            <button id="macd" class="pull-right btn btn-default btn-xs col-md-2" data-bind="click: toggleMacd, text: showMacd() ? 'Hide' : 'Show'"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default" data-bind="visibleSlideDown: showMa5Ma14()">
+                            <div class="panel-heading clearfix">
+                                <h3 class="panel-title pull-left" data-bind="text: 'MA' + maFastestDatumPoints() + '/' + maFastDatumPoints()">MA5/14</h3>
+                                <button class="pull-right btn btn-default btn-xs" data-bind="click: toggleMa5Ma14"><i class="fa fa-times"></i></button>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-horizontal" role="form">
+                                    <div class="form-group clearfix">
+                                        <label for="datum-points" class="col-sm-3 pull-left">MA <span data-bind="text: maFastestDatumPoints">5</span></label>
+                                        <div class="col-sm-9" data-bind="event: {slide: slideMaFastest} ">
+                                            <div class="pull-right">
+                                                <input class="slider" style="width:100%" type="text" value="" data-slider-min="0" data-slider-max="5" data-slider-step="1" data-slider-value="5" data-slider-handle="square">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group clearfix">
+                                        <label for="datum-points" class="col-sm-3 pull-left">MA <span data-bind="text: maFastDatumPoints">14</span></label>
+                                        <div class="col-sm-9" data-bind="event: {slide: slideMaFast} ">
+                                            <div class="pull-right">
+                                                <input class="slider" style="width:100%" type="text" value="" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-value="14" data-slider-handle="square">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default" data-bind="visibleSlideDown: showMa50Ma100Ma200()">
+                            <div class="panel-heading clearfix">
+                                <h3 class="panel-title pull-left">MA50/100/200</h3>
+                                <button class="pull-right btn btn-default btn-xs" data-bind="click: toggleMa50Ma100Ma200"><i class="fa fa-times"></i></button>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-horizontal" role="form">
+                                    <div class="form-group clearfix">
+                                        <label for="datum-points" class="col-sm-3 pull-left">MA <span data-bind="text: maSlowDatumPoints">50</span></label>
+                                        <div class="col-sm-9" data-bind="event: {slide: slideMaSlow} ">
+                                            <div class="pull-right">
+                                                <input class="slider" style="width:100%" type="text" value="" data-slider-min="50" data-slider-max="100" data-slider-step="1" data-slider-value="50" data-slider-handle="square">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group clearfix">
+                                        <label for="datum-points" class="col-sm-3 pull-left">MA <span data-bind="text: maSlowerDatumPoints">100</span></label>
+                                        <div class="col-sm-9" data-bind="event: {slide: slideMaSlower} ">
+                                            <div class="pull-right">
+                                                <input class="slider" style="width:100%" id="slider" type="text" value="" data-slider-min="100" data-slider-max="200" data-slider-step="1" data-slider-value="100" data-slider-handle="square">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group clearfix">
+                                        <label for="datum-points" class="col-sm-3 pull-left">MA <span data-bind="text: maSlowestDatumPoints">200</span></label>
+                                        <div class="col-sm-9" data-bind="event: {slide: slideMaSlowest} ">
+                                            <div class="pull-right">
+                                                <input class="slider" style="width:100%" id="slider" type="text" value="" data-slider-min="200" data-slider-max="1000" data-slider-step="10" data-slider-value="200" data-slider-handle="square">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default" data-bind="visibleSlideDown: showMacd()">
+                            <div class="panel-heading clearfix">
+                                <h3 class="panel-title pull-left">MACD</h3>
+                                <button class="pull-right btn btn-default btn-xs" data-bind="click: toggleMacd"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <h1>To Do</h1>
+                <ul>
+                    <li>refactor code!!!</li>
+                    <li>create custom ticks for dates that show years when only months are visible</li>
+                    <li>implement timeperiod all</li>
+                    <li>highligt highest/lowest points in plot</li>
+                    <li>toggle to candle stick plot</li>
+                    <li>make macd parameters adjustable</li>
+                </ul>
+            </div>
+
+        </div><!-- /.container -->
+
+    </body>
+</html>
