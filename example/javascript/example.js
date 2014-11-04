@@ -13,6 +13,7 @@ $(function() {
         self.symbols = ko.observableArray([
             {id: '^OMX', text: "OMXS30"},
             {id: 'PXX.TO', text: "Black Pearl Resources"},
+            {id: 'AOI.ST', text: "Africa Oil"},
             {id: 'GIX.TO', text: "Geologix Explorations Inc."},
             {id: 'FOE.OL', text: "F.OLSEN ENERGY"},
             {id: 'HM-B.ST', text: "HM-B"},
