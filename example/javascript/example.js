@@ -342,7 +342,7 @@ $(function() {
             self.plot();
         };
 
-        self.toggleSplitDetection = function(viewModel, event) {
+        self.toggleSplitDetection = function() {
             if (self.enableSplitDetection() === false) {
                 log.debug("Enabling Split Detection");
                 self.enableSplitDetection(true);
@@ -350,14 +350,10 @@ $(function() {
                 log.debug("Disabling Split Detection");
                 self.enableSplitDetection(false);
             }
-            if (event) {
-                event.stopPropagation();
-            }
             self.processData();
             self.plot();
-            return false;
         };
-        self.toggleMa5Ma14 = function(viewModel, event) {
+        self.toggleMa5Ma14 = function() {
             if (self.showMa5Ma14() === true) {
                 log.debug("Hiding MA5/MA14");
                 self.showMa5Ma14(false);
@@ -366,12 +362,8 @@ $(function() {
                 self.showMa5Ma14(true);
             }
             self.plot();
-            if (event) {
-                event.stopPropagation();
-            }
-            return false;
         };
-        self.toggleMa50Ma100Ma200 = function(viewModel, event) {
+        self.toggleMa50Ma100Ma200 = function() {
             if (self.showMa50Ma100Ma200() === true) {
                 log.debug("Hiding MA50/MA100/MA200");
                 self.showMa50Ma100Ma200(false);
@@ -380,21 +372,14 @@ $(function() {
                 self.showMa50Ma100Ma200(true);
             }
             self.plot();
-            if (event) {
-                event.stopPropagation();
-            }
-            return false;
         };
-        self.toggleMacd = function(viewModel, event) {
+        self.toggleMacd = function() {
             if (self.showMacd() === true) {
                 log.debug("Hiding MACD 12,26,9");
                 self.showMacd(false);
             } else {
                 log.debug("Showing MACD 12,26,9");
                 self.showMacd(true);
-            }
-            if (event) {
-                event.stopPropagation()
             }
             self.plot();
         };

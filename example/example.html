@@ -68,7 +68,11 @@
                 })
                 $('#to-date-button').on('click', function(ev) {
                     $('#to-date').datepicker('show');
-                })
+                });
+
+                $(document).on('click', '.dropdown-menu', function (e) {
+                    $(this).hasClass('dropdown-menu-keep-open') && e.stopPropagation(); // This replace if conditional.
+                });
 
             });
         </script>
@@ -148,7 +152,7 @@
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Scale <span class="caret"></span>
                                     </button>
-                                    <ul class="dropdown-menu" role="menu" style="width:200px;">
+                                    <ul class="dropdown-menu dropdown-menu-keep-open" role="menu" style="width:200px;">
                                         <li>
                                             <a href="#" class="clearfix" data-bind="click: changeScaleToDay">Day <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'day'}"></i></a>
                                         </li>
@@ -169,7 +173,7 @@
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">TA <span class="caret"></span>
                                     </button>
-                                    <ul class="dropdown-menu" role="menu" style="width:200px;">
+                                    <ul class="dropdown-menu dropdown-menu-keep-open" role="menu" style="width:200px;">
                                         <li>
                                             <a href="#" class="clearfix" data-bind="click: toggleMa5Ma14"><span data-bind="text: 'MA' + maFastestDatumPoints() + '/' + maFastDatumPoints()">MA5/14</span> <i class="fa pull-right" data-bind="css: {'fa-check': showMa5Ma14(), 'fa-check-w': !showMa5Ma14()}"></i></a>
                                         </li>
@@ -201,7 +205,7 @@
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog fa-lg"></i></span>
                                     </button>
-                                    <ul class="dropdown-menu" role="menu" style="width:200px;">
+                                    <ul class="dropdown-menu dropdown-menu-keep-open" role="menu" style="width:200px;">
                                         <li>
                                             <a href="#" class="clearfix" data-bind="click: toggleSplitDetection">Split Detection <i class="fa pull-right" data-bind="css: {'fa-check': enableSplitDetection()}"></i></a>
                                         </li>
