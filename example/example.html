@@ -124,11 +124,11 @@
         <div class="container">
 
             <div id="examples" class="row">
-                <h2 data-bind="text: symbolName">Symbol Name</h2>
                 <div class="col-md-12">
                     <div id="ta-header" class="col-md-12">
                         <div class="pull-left">
                             <ul class="list-inline">
+                                <li><input id="symbol"/></li>
                                 <li class="hover-popover" data-content="Percent" data-bind="css: percentColorClass"><i class="fa" data-bind="css: percentArrowClass"></i> <strong data-bind="html: formattedPercent"></strong></li>
                                 <li class="text-info hover-popover" data-content="Highest"><i class="fa fa-chevron-up"></i> <strong data-bind="text: formattedHighest"></strong></li>
                                 <li class="text-info hover-popover" data-content="Lowest"><i class="fa fa-chevron-down text-error"></i> <strong data-bind="text: formattedLowest"></strong></li>
@@ -250,12 +250,6 @@
                             </div>
                             <div class="panel-body">
                                 <div class="form-horizontal" role="form">
-                                    <div class="form-group">
-                                        <label for="symbol" class="col-sm-3 pull-left">Symbol</label>
-                                        <div class="col-sm-9">
-                                            <input id="symbol" class="pull-right"/>
-                                        </div>
-                                    </div>
                                     <div class="form-group">
                                         <label for="scale" class="col-sm-3 pull-left">Scale</label>
                                         <div class="col-sm-9">
