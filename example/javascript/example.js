@@ -153,7 +153,6 @@ $(function() {
             $("#from-date").datepicker("setDate", self.fromDate().toDate());
             return formatDate(self.fromDate());
         });
-        self.showSettings = ko.observable(defaultBooleanValue(false, url.param("showSettings")));
         self.settings = {
             showXaxisTicksInGrid: true,
             paddingFactor: 0.05
@@ -343,19 +342,6 @@ $(function() {
             self.plot();
         };
 
-        self.toggleSettings = function(viewModel, event) {
-            if (self.showSettings() === false) {
-                log.debug("Showing Settings");
-                self.showSettings(true);
-            } else {
-                log.debug("Hiding Settings");
-                self.showSettings(false);
-            }
-            if (event) {
-                event.stopPropagation();
-            }
-            return false;
-        };
         self.toggleSplitDetection = function(viewModel, event) {
             if (self.enableSplitDetection() === false) {
                 log.debug("Enabling Split Detection");

@@ -44,16 +44,3 @@ body {
 #to-date {
     right: 0px;
 }
-
-#settings {
-    position: fixed;
-    left: 0;
-    z-index: 1000;
-}
-#settings .panel {
-    margin-bottom: 0px;
-    border-top-width: 0px;
-}
-#settings .panel:first-child {
-    border-top-width: 1px;
-}

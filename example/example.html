@@ -173,15 +173,40 @@
                                         <li>
                                             <a href="#" class="clearfix" data-bind="click: toggleMa5Ma14"><span data-bind="text: 'MA' + maFastestDatumPoints() + '/' + maFastDatumPoints()">MA5/14</span> <i class="fa pull-right" data-bind="css: {'fa-check': showMa5Ma14(), 'fa-check-w': !showMa5Ma14()}"></i></a>
                                         </li>
-                                        <li>
-                                            <a href="#" class="clearfix" data-bind="click: toggleMa50Ma100Ma200">MA50/100/200 <i class="fa pull-right" data-bind="css: {'fa-check': showMa50Ma100Ma200(), 'fa-check-w': !showMa50Ma100Ma200()}"></i></a>
+                                        <li style="padding-left: 25px" data-bind="event: {slide: slideMaFastest}">
+                                            <input class="slider" style="width: 145px" type="text" value="" data-slider-min="0" data-slider-max="5" data-slider-step="1" data-slider-value="5" data-slider-handle="square">
                                         </li>
+                                        <li style="padding-left: 25px" data-bind="event: {slide: slideMaFast}">
+                                            <input class="slider" style="width: 145px" type="text" value="" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-value="14" data-slider-handle="square">
+                                        </li>
+                                        <li role="presentation" class="divider"></li>
+                                        <li>
+                                            <a href="#" class="clearfix" data-bind="click: toggleMa50Ma100Ma200"><span data-bind="text: 'MA' + maSlowDatumPoints() + '/' + maSlowerDatumPoints() + '/' + maSlowestDatumPoints()">MA50/100/200</span> <i class="fa pull-right" data-bind="css: {'fa-check': showMa50Ma100Ma200(), 'fa-check-w': !showMa50Ma100Ma200()}"></i></a>
+                                        </li>
+                                        <li style="padding-left: 25px" data-bind="event: {slide: slideMaSlow}">
+                                            <input class="slider" style="width: 145px" type="text" value="" data-slider-min="50" data-slider-max="100" data-slider-step="1" data-slider-value="50" data-slider-handle="square">
+                                        </li>
+                                        <li style="padding-left: 25px" data-bind="event: {slide: slideMaSlower}">
+                                            <input class="slider" style="width: 145px" id="slider" type="text" value="" data-slider-min="100" data-slider-max="200" data-slider-step="1" data-slider-value="100" data-slider-handle="square">
+                                        </li>
+                                        <li style="padding-left: 25px" data-bind="event: {slide: slideMaSlowest}">
+                                            <input class="slider" style="width: 145px" id="slider" type="text" value="" data-slider-min="200" data-slider-max="1000" data-slider-step="10" data-slider-value="200" data-slider-handle="square">
+                                        </li>
+                                        <li role="presentation" class="divider"></li>
                                         <li>
                                             <a href="#" class="clearfix" data-bind="click: toggleMacd">MACD <i class="fa pull-right" data-bind="css: {'fa-check': showMacd()}"></i></a>
                                         </li>
                                     </ul>
                                 </div>
-                                <button type="button" class="btn btn-default" data-bind="click: toggleSettings, css: {active: showSettings()}"><i class="fa fa-cog fa-lg"></i></button>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog fa-lg"></i></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" style="width:200px;">
+                                        <li>
+                                            <a href="#" class="clearfix" data-bind="click: toggleSplitDetection">Split Detection <i class="fa pull-right" data-bind="css: {'fa-check': enableSplitDetection()}"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -238,125 +263,6 @@
                                                       <input id="from-date" class="btn btn-default" type="button" type="text" class="form-control" data-bind="value: xaxisMinDate().toString('yyyy-MM-dd')"/>
                                                       <input id="to-date" class="btn btn-default" type="button" type="text" class="form-control" data-bind="value: xaxisMaxDate().toString('yyyy-MM-dd')"/>
                             -->
-                        </div>
-                    </div>
-                </div>
-                <div id="settings" class="col-md-4" data-bind="visibleSlideRight: showSettings()">
-                    <div class="row">
-                        <div class="panel panel-default">
-                            <div class="panel-heading clearfix">
-                                <h3 class="panel-title pull-left">Settings</h3>
-                                <button class="pull-right btn btn-default btn-xs" data-bind="click: toggleSettings"><i class="fa fa-times"></i></button>
-                            </div>
-                            <div class="panel-body">
-                                <div class="form-horizontal" role="form">
-                                    <div class="form-group">
-                                        <label for="scale" class="col-sm-3 pull-left">Scale</label>
-                                        <div class="col-sm-9">
-                                            <div class="btn-group pull-right">
-                                                <button type="button" class="btn btn-default btn-xs" data-bind="click: changeScaleToDay, css: {active: scale() === 'day'}">Day</button>
-                                                <button type="button" class="btn btn-default btn-xs" data-bind="click: changeScaleToWeek, css: {active: scale() === 'week'}">Week</button>
-                                                <button type="button" class="btn btn-default btn-xs" data-bind="click: changeScaleToMonth, css: {active: scale() === 'month'}">Month</button>
-                                                <button type="button" class="btn btn-default btn-xs" data-bind="click: changeScaleToYear, css: {active: scale() === 'year'}">Yeer</button>
-                                                <button type="button" class="btn btn-default btn-xs" data-bind="click: changeScaleToAuto, css: {active: scale() === 'auto'}">Auto</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="ma5-14" class="col-sm-3 pull-left">Split Detection</label>
-                                        <div class="col-sm-9">
-                                            <button id="ma5-14" class="pull-right btn btn-default btn-xs col-md-2" data-bind="click: toggleSplitDetection, text: enableSplitDetection() ? 'Disable' : 'Enable'"></button>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="ma5-14" class="col-sm-3 pull-left" data-bind="text: 'MA' + maFastestDatumPoints() + '/' + maFastDatumPoints()">MA5/14</label>
-                                        <div class="col-sm-9">
-                                            <button id="ma5-14" class="pull-right btn btn-default btn-xs col-md-2" data-bind="click: toggleMa5Ma14, text: showMa5Ma14() ? 'Hide' : 'Show'"></button>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="ma50-100-200" class="col-sm-3 pull-left">MA50/100/200</label>
-                                        <div class="col-sm-9">
-                                            <button id="ma50-100-200" class="pull-right btn btn-default btn-xs col-md-2" data-bind="click: toggleMa50Ma100Ma200, text: showMa50Ma100Ma200() ? 'Hide' : 'Show'"></button>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="macd" class="col-sm-3 pull-left">MACD</label>
-                                        <div class="col-sm-9">
-                                            <button id="macd" class="pull-right btn btn-default btn-xs col-md-2" data-bind="click: toggleMacd, text: showMacd() ? 'Hide' : 'Show'"></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="panel panel-default" data-bind="visibleSlideDown: showMa5Ma14()">
-                            <div class="panel-heading clearfix">
-                                <h3 class="panel-title pull-left" data-bind="text: 'MA' + maFastestDatumPoints() + '/' + maFastDatumPoints()">MA5/14</h3>
-                                <button class="pull-right btn btn-default btn-xs" data-bind="click: toggleMa5Ma14"><i class="fa fa-times"></i></button>
-                            </div>
-                            <div class="panel-body">
-                                <div class="form-horizontal" role="form">
-                                    <div class="form-group clearfix">
-                                        <label for="datum-points" class="col-sm-3 pull-left">MA <span data-bind="text: maFastestDatumPoints">5</span></label>
-                                        <div class="col-sm-9" data-bind="event: {slide: slideMaFastest} ">
-                                            <div class="pull-right">
-                                                <input class="slider" style="width:100%" type="text" value="" data-slider-min="0" data-slider-max="5" data-slider-step="1" data-slider-value="5" data-slider-handle="square">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group clearfix">
-                                        <label for="datum-points" class="col-sm-3 pull-left">MA <span data-bind="text: maFastDatumPoints">14</span></label>
-                                        <div class="col-sm-9" data-bind="event: {slide: slideMaFast} ">
-                                            <div class="pull-right">
-                                                <input class="slider" style="width:100%" type="text" value="" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-value="14" data-slider-handle="square">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="panel panel-default" data-bind="visibleSlideDown: showMa50Ma100Ma200()">
-                            <div class="panel-heading clearfix">
-                                <h3 class="panel-title pull-left">MA50/100/200</h3>
-                                <button class="pull-right btn btn-default btn-xs" data-bind="click: toggleMa50Ma100Ma200"><i class="fa fa-times"></i></button>
-                            </div>
-                            <div class="panel-body">
-                                <div class="form-horizontal" role="form">
-                                    <div class="form-group clearfix">
-                                        <label for="datum-points" class="col-sm-3 pull-left">MA <span data-bind="text: maSlowDatumPoints">50</span></label>
-                                        <div class="col-sm-9" data-bind="event: {slide: slideMaSlow} ">
-                                            <div class="pull-right">
-                                                <input class="slider" style="width:100%" type="text" value="" data-slider-min="50" data-slider-max="100" data-slider-step="1" data-slider-value="50" data-slider-handle="square">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group clearfix">
-                                        <label for="datum-points" class="col-sm-3 pull-left">MA <span data-bind="text: maSlowerDatumPoints">100</span></label>
-                                        <div class="col-sm-9" data-bind="event: {slide: slideMaSlower} ">
-                                            <div class="pull-right">
-                                                <input class="slider" style="width:100%" id="slider" type="text" value="" data-slider-min="100" data-slider-max="200" data-slider-step="1" data-slider-value="100" data-slider-handle="square">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group clearfix">
-                                        <label for="datum-points" class="col-sm-3 pull-left">MA <span data-bind="text: maSlowestDatumPoints">200</span></label>
-                                        <div class="col-sm-9" data-bind="event: {slide: slideMaSlowest} ">
-                                            <div class="pull-right">
-                                                <input class="slider" style="width:100%" id="slider" type="text" value="" data-slider-min="200" data-slider-max="1000" data-slider-step="10" data-slider-value="200" data-slider-handle="square">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="panel panel-default" data-bind="visibleSlideDown: showMacd()">
-                            <div class="panel-heading clearfix">
-                                <h3 class="panel-title pull-left">MACD</h3>
-                                <button class="pull-right btn btn-default btn-xs" data-bind="click: toggleMacd"><i class="fa fa-times"></i></button>
-                            </div>
                         </div>
                     </div>
                 </div>
