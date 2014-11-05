@@ -686,7 +686,7 @@ $(function() {
             }
         });
         self.showPriceInfo = function(viewModel, event, pos, item) {
-            if (self.$plot !== undefined && self.$macdPlot !== undefined) {// TODO: Create isPlotsInitialized instead of self.$plot !== undefined && self.$macdPlot !== undefined
+            if (self.$plot !== undefined) {
                 var priceInfoIndex = self.findClosestDatapoint(pos.x);
                 if (priceInfoIndex !== self.previousPriceInfoIndex) {
                     log.trace("Showing price info");
@@ -700,7 +700,7 @@ $(function() {
                         x: date,
                         y: price
                     });
-                    if (self.showMacd()) {
+                    if (self.showMacd() && self.$macdPlot !== undefined) {
                         self.$macdPlot.lockCrosshair({
                             x: date,
                             y: price
@@ -727,9 +727,9 @@ $(function() {
         };
 
         self.hidePriceInfo = function() {
-            if (self.$plot !== undefined && self.$macdPlot !== undefined) {// TODO: Create isPlotsInitialized instead of self.$plot !== undefined && self.$macdPlot !== undefined
+            if (self.$plot !== undefined) {
                 self.$plot.clearCrosshair();
-                if (self.showMacd()) {
+                if (self.showMacd() && self.$macdPlot !== undefined) {
                     self.$macdPlot.clearCrosshair();
                 }
                 self.$plot.unhighlight(0, self.previousPriceInfoIndex);
