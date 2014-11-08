@@ -249,6 +249,19 @@ $(function() {
         self.formattedLowest = ko.computed(function() {
             return formatPrice(self.lowest());
         });
+        self.profit = ko.observable();
+        self.formattedProfit = ko.computed(function() {
+            return formatPercent(self.profit());
+        });
+        self.profitColorClass = ko.computed(function() {
+            if (self.profit() > 0) {
+                return "text-success";
+            } else if (self.profit() < 0) {
+                return "text-danger";
+            } else {
+                return "";
+            }
+        });
 
         // Behaviors
         self.changeScaleToAuto = function() {
@@ -912,6 +925,7 @@ $(function() {
                 $("#macd-plot").css("margin-top", "-26px");
                 $("#macd-plot").slideDown('fast', function() {
                     self.$macdPlot = $.plot(this, self.macdPlotArgs.series, self.macdPlotArgs.options);
+                    self.updateProfit();
                 });
             } else {
                 $('#macd-plot').slideUp('fast', function() {
@@ -1038,6 +1052,50 @@ $(function() {
             self.percent((last - first) / first);
             self.highest(highest);
             self.lowest(lowest);
+        };
+
+        self.updateProfit = function() {
+            log.trace("updateProfit()");
+
+            // Find highest and lowest
+            var lastMacd;
+            var macd;
+            var stocks = 0;
+            var money = 1000;
+            var profit;
+            var data = self.plotArgs.series[0].data;
+            $.each(data, function(index, value) {
+                if (value[0].valueOf() < self.plotArgs.options.xaxis.min.valueOf() || value[0].valueOf() > self.plotArgs.options.xaxis.max.valueOf()) {
+                    return true;
+                }
+                if (index == 0 || self.macdHistogram().data[index][1] === null) {
+                    return true;
+                }
+                if (lastMacd === undefined) {
+                    lastMacd = self.macdHistogram().data[index][1];
+                    return true;
+                }
+
+                macd = self.macdHistogram().data[index][1];
+                if (lastMacd < 0 && macd > 0) {
+                    log.trace("positive trend detected");
+                    if (money != 0) {
+                        stocks = money / value[1];
+                        money = 0;
+                        log.trace("bougth for price " + value[1] + " on " + value[0].format());
+                    }
+                } else if (lastMacd > 0 && macd < 0) {
+                    log.trace("negative trend detected");
+                    if (stocks != 0) {
+                        money = stocks * value[1];
+                        profit = money / 1000 - 1;
+                        stocks = 0;
+                        log.trace("sold for price " + value[1] + " on " + value[0].format() + " with profit " + numeral(profit).format("0.00%"));
+                    }
+                }
+                lastMacd = self.macdHistogram().data[index][1];
+            });
+            self.profit(profit);
         };
 
         // Initialize
