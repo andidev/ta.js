@@ -137,6 +137,7 @@ $(function() {
         self.enableSplitDetection = ko.observable(defaultBooleanValue(true, url.param("enableSplitDetection")));
         self.scale = ko.observable(defaultValue("day", url.param("scale")));
         self.timePeriod = ko.observable(defaultValue("3years", url.param("timePeriod")));
+        self.zoomHistory = ko.observableArray();
         self.toDate = ko.observable();
         self.formattedToDate = ko.computed(function() {
             if (self.toDate() === undefined) {
@@ -307,6 +308,11 @@ $(function() {
 
         self.changeTimePeriodToAll = function() {
             log.debug("Changing time period to All");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             self.timePeriod("all");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
@@ -314,6 +320,11 @@ $(function() {
         };
         self.changeTimePeriodTo10Years = function() {
             log.debug("Changing time period to 10 Years");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             self.timePeriod("10years");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
@@ -321,6 +332,11 @@ $(function() {
         };
         self.changeTimePeriodTo3Years = function() {
             log.debug("Changing time period to 3 Years");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             self.timePeriod("3years");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
@@ -328,6 +344,11 @@ $(function() {
         };
         self.changeTimePeriodToYear = function() {
             log.debug("Changing time period to Year");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             self.timePeriod("year");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
@@ -335,6 +356,11 @@ $(function() {
         };
         self.changeTimePeriodTo3Months = function() {
             log.debug("Changing time period to 3 Month");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             self.timePeriod("3months");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
@@ -342,6 +368,11 @@ $(function() {
         };
         self.changeTimePeriodToMonth = function() {
             log.debug("Changing time period to Month");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             self.timePeriod("month");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
@@ -349,6 +380,11 @@ $(function() {
         };
         self.changeTimePeriodToWeek = function() {
             log.debug("Changing time period to Week");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             self.timePeriod("week");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
@@ -496,19 +532,49 @@ $(function() {
             }
         };
 
+        self.zoomSelectionFrom;
+        self.zoomSelectionTo;
+        self.mouseDown = function(viewModel, event) {
+            log.debug("Mouse key pressed, which = " + event.which);
+            if (event.which === 1) {
+                log.debug("Left mouse key pressed");
+                self.zoomSelectionFrom = event.clientX;
+            }
+        };
+        self.mouseMove = function(viewModel, event) {
+            if (event.which === 1) {
+                log.debug("Mouse is moved with left mouse key pressed");
+                self.zoomSelectionTo = event.clientX;
+            }
+        };
         self.zoomSelection = function(viewModel, event, ranges) {
             log.debug("Zooming selected");
+            var zoomDirection = (self.zoomSelectionTo - self.zoomSelectionFrom) < 0 ? "left" : "right";
             var fromIndex = self.findClosestDatapoint(ranges.xaxis.from);
             var toIndex = self.findClosestDatapoint(ranges.xaxis.to);
             if ((toIndex - fromIndex) >= 2) {
-                var from = self.price().data[fromIndex][0].clone();
-                var to = self.price().data[toIndex][0].clone();
-                self.updateFromDate(from);
-                self.updateToDate(to);
-                self.timePeriod("custom");
-                self.plot();
+                if (zoomDirection === "left") {
+                    self.undoZoom();
+                } else if (zoomDirection === "right"){
+                    self.zoomHistory.push({
+                        fromDate: self.fromDate().clone(),
+                        toDate: self.toDate().clone(),
+                        timePeriod: self.timePeriod()
+                    });
+                    var from = self.price().data[fromIndex][0].clone();
+                    var to = self.price().data[toIndex][0].clone();
+                    self.updateFromDate(from);
+                    self.updateToDate(to);
+                    self.timePeriod("custom");
+                    self.plot();
+                }
             }
-            self.plot();
+            if (ranges !== null) {
+                self.$plot.clearSelection();
+                if (self.showMacd()) {
+                    self.$macdPlot.clearSelection();
+                }
+            }
         };
         self.syncSelectionInPlot = function(viewModel, event, ranges) {
             if (ranges !== null) {
@@ -539,10 +605,23 @@ $(function() {
             return true;
         });
         self.undoZoom = function() {
-            log.debug("Undoing zoom");
+            log.debug("Undoing zoom pressed, zoomHistory: " + JSON.stringify(self.zoomHistory()));
+            var lastZoomHistory = self.zoomHistory.pop();
+            if (lastZoomHistory !== undefined) {
+                log.debug("Undoing zoom");
+                self.updateFromDate(lastZoomHistory.fromDate);
+                self.updateToDate(lastZoomHistory.toDate);
+                self.timePeriod(lastZoomHistory.timePeriod);
+                self.plot();
+            }
         };
         self.zoomOut = function() {
             log.debug("Zooming out");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             var delta = getZoomOutDeltaForTimePeriod();
             if (self.toDate().isSame(self.price().data[self.price().data.length - 1][0])) {
                 self.updateFromDate(self.fromDate().subtract(delta.timeUnit, delta.value * 2));
@@ -557,6 +636,11 @@ $(function() {
         };
         self.zoomIn = function() {
             log.debug("Zooming in");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             var delta = getZoomInDeltaForTimePeriod();
             if (self.toDate().isSame(self.price().data[self.price().data.length - 1][0])) {
                 self.updateFromDate(self.fromDate().add(delta.timeUnit, delta.value * 2));
@@ -572,6 +656,11 @@ $(function() {
 
         self.panLeft = function() {
             log.debug("Panning left");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             var delta = getPanDeltaForTimePeriod();
             var bouncedDuration = self.updateFromDate(self.fromDate().clone().subtract(delta.timeUnit, delta.value));
             if (bouncedDuration !== null) {
@@ -584,6 +673,11 @@ $(function() {
         };
         self.panRight = function() {
             log.debug("Panning right");
+            self.zoomHistory.push({
+                fromDate: self.fromDate().clone(),
+                toDate: self.toDate().clone(),
+                timePeriod: self.timePeriod()
+            });
             var delta = getPanDeltaForTimePeriod();
             var bouncedDuration = self.updateToDate(self.toDate().clone().add(delta.timeUnit, delta.value));
             if (bouncedDuration !== null) {
@@ -625,6 +719,10 @@ $(function() {
             } else if (keyCode === 27) { // Escape
                 log.debug("Escape key pressed");
                 self.changeTimePeriodToAll();
+                return false;
+            } else if (keyCode === 8) { // Backspace
+                log.debug("Backspace key pressed");
+                self.undoZoom();
                 return false;
             } else if (keyCode === 17) { // Ctrl
                 log.debug("Ctrl key pressed");
