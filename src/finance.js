@@ -15,29 +15,12 @@
         }
 
         // if first argument is an array
-        if (isObject(arg1)) {
+        if (isObject(arg1) && arg1.symbol !== undefined) {
             this._symbol = arg1.symbol;
-            this._fromDate = arg1.fromDate;
-            this._toDate = arg1.toDate;
             this._data = arg1.data !== undefined ? arg1.data : [];
-            this._volume = arg1.volume !== undefined ? arg1.volume : [];
-            // handle case when finance object is passed to finance
-        } else if (arg1 instanceof finance) {
-            // duplicate the object and pass it back
-            return finance({
-                symbol: this._symbol,
-                fromDate: this._fromDate,
-                toDate: this._toDate,
-                price: this._data,
-                volume: this._volume
-            });
-            // unexpected argument value, return empty finance object
+        // unexpected argument value, return empty finance object
         } else {
-            this._symbol = '^VIX';
-            this._fromDate = moment("1960-09-11");
-            this._toDate = moment("2014-11-09");
-            this._data = [];
-            this._volume = [];
+            throw "First argument must be an object containing a symbol";
         }
         return this;
     };
@@ -97,10 +80,13 @@
                 log.warn("diagnostics.cvs = " + data.query.diagnostics.csv);
             }
             if (data.query.diagnostics.warning !== undefined) {
-                log.warn("diagnostics.warning = " + data.query.diagnostics.warning);
                 if (data.query.diagnostics.warning === "You have reached the maximum number of items which can be returned in a request") {
+                    log.debug("Was not able to receive all data in on call");
+                    log.debug("Calling downloadData recursively to download the rest of the data");
                     var recursiveToDate = moment(from.date).subtract('days', 1);
                     Array.prototype.push.apply(returnData, downloadData(symbol, fromDate, recursiveToDate));
+                } else {
+                    log.warn("diagnostics.warning = " + data.query.diagnostics.warning);
                 }
             }
         }).fail(function() {
@@ -120,10 +106,11 @@
      *
      * @return     {Array}    the Symbol Price
      */
-    finance.fn.price = function () {
+    finance.fn.data = function () {
         var start = moment().valueOf();
-        this._data = downloadData(this._symbol, this._fromDate, this._toDate);
-        log.info(JSON.stringify(this._data));
+        var fromDate = moment("1900-01-01");
+        var toDate = moment();
+        this._data = downloadData(this._symbol, fromDate, toDate);
         var stop = moment().valueOf();
         var executionTime = stop - start;
         log.debug("Downloading data took " + executionTime + " milliseconds");
@@ -151,4 +138,4 @@ consoleAppender.setThreshold(log4javascript.Level.DEBUG);
 log.setLevel(log4javascript.Level.TRACE);
 log.trace("Document Ready");
 
-log.info(finance().price());
+log.info(finance({symbol: "^VIX"}).data());
