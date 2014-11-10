@@ -871,15 +871,9 @@ $(function() {
         };
 
         self.downloadData = function(callback) {
-            log.debug("Downloading data for symbol " + symbol);
-            var start = moment().valueOf();
-            getHisticalPrices(self.symbol(), Date.parse("1995"), moment(), function(data) {
-                var data = convertToFlotFormat(data.query.results.row);
-                var stop = moment().valueOf();
-                var executionTime = stop - start;
-                log.debug("Downloading data took " + executionTime + " milliseconds");
-                callback(data);
-            }, self.debug());
+            log.debug("Downloading data for symbol " + self.symbol());
+            var data = convertToFlotFormat(finance({symbol: self.symbol()}).data());
+            callback(data);
         };
 
         self.processData = function() {
