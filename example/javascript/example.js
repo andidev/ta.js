@@ -690,6 +690,9 @@ $(function() {
         };
         self.ctrlKeyDown = false;
         self.keyboardShortcutsHandler = _.throttle(function(viewModel, event) {
+            if (event.target.tagName === "INPUT") {
+                return true;
+            }
             var keyCode = (event.which ? event.which : event.keyCode);
             log.debug("Handling keyboard shortcuts (keyCode = " + keyCode + ")");
             if (keyCode === 37) { // Left arrow
