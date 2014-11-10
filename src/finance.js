@@ -1,13 +1,5 @@
 (function () {
 
-    // helpers
-    var toString = Object.prototype.toString;
-
-    // test if object
-    var isObject = function (arg) {
-        return toString.call(arg) === '[object Object]';
-    };
-
     var finance = function (arg1) { // core constructor
         // ensure to use the `new` operator
         if (!(this instanceof finance)) {
@@ -16,13 +8,140 @@
 
         // if first argument is an array
         if (isObject(arg1) && arg1.symbol !== undefined) {
-            this._symbol = arg1.symbol;
-            this._data = arg1.data !== undefined ? arg1.data : [];
+            this.symbol = arg1.symbol;
+            this.dataCacheKey = "dataCache." + arg1.symbol;
         // unexpected argument value, return empty finance object
         } else {
             throw "First argument must be an object containing a symbol";
         }
         return this;
+    };
+
+    // create `fn` alias to `prototype` property
+    finance.fn = finance.prototype = {};
+
+    /**
+     * Get the symbol data (downloads it from yahoo finance)
+     *
+     * @return     {Array} the symbol data
+     */
+    finance.fn.data = function () {
+        try {
+            if (this.isDataCacheEmpty()) {
+                var fromDate = moment("1900-01-01");
+                var toDate = mostRecentWorkingDay();
+                var start = moment().valueOf();
+                var downloadedData = downloadData(this.symbol, fromDate, toDate);
+                var stop = moment().valueOf();
+                var executionTime = stop - start;
+                log.debug("Downloading data took " + executionTime + " milliseconds");
+                this.setDataCache(downloadedData);
+            } else if (this.isDataCacheOutOfDate()) {
+                var fromDate = moment(this.getDataCache()[0].date).add(1, 'day');
+                var toDate = mostRecentWorkingDay();
+                var start = moment().valueOf();
+                var downloadedData = downloadData(this.symbol, fromDate, toDate);
+                var stop = moment().valueOf();
+                var executionTime = stop - start;
+                log.debug("Downloading data took " + executionTime + " milliseconds");
+                if (downloadedData.length > 0) {
+                    this.appendDataCache(downloadedData);
+                }
+            }
+
+            return this.getDataCache();
+        } catch (e) {
+            alert("Something went wrong. Clearing symbol data cache for symbol = " + this.symbol + " for safety");
+            this.clearDataCache();
+            throw e;
+        }
+    };
+
+    /**
+     * Get the cached symbol data in localeStorage
+     *
+     * @param      {Object}   data
+     */
+    finance.fn.getDataCache = function () {
+        return simpleStorage.get(this.dataCacheKey);
+    };
+
+    /**
+     * Set the cached symbol data in localeStorage
+     *
+     * @param      {Object}   data
+     */
+    finance.fn.setDataCache = function (data) {
+        simpleStorage.set(this.dataCacheKey, data);
+    };
+
+    /**
+     * Append data to the cached symbol data in localeStorage
+     * @param      {Object}   data to append
+     */
+    finance.fn.appendDataCache = function (data) {
+        Array.prototype.push.apply(data, this.getDataCache());
+        this.setDataCache(data);
+    };
+
+    /**
+     * Clear the currently cached symbol data from localeStorage
+     * @return     {finance} returns this finance object
+     */
+    finance.fn.clearDataCache = function () {
+        log.debug("Clearing cached symbol data from localeStorage for symbol " + this.symbol);
+        simpleStorage.deleteKey(this.dataCacheKey);
+        return this;
+    };
+
+    /**
+     * Check if cached symbol data in localeStorage does not exist
+     *
+     * @return     {boolean} true if the data cache is empty
+     */
+    finance.fn.isDataCacheEmpty = function () {
+        if (this.getDataCache() === undefined) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    /**
+     * Check if cached symbol data in localeStorage needs to be updated
+     *
+     * @param      {Object}   data
+     * @return     {boolean} true if the data cache needs to be updated
+     */
+    finance.fn.isDataCacheOutOfDate = function (data) {
+        var lastDataCacheDate = moment(this.getDataCache()[0].date);
+        if (lastDataCacheDate.isBefore(mostRecentWorkingDay())) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    // expose the library
+    window.finance = finance;
+    
+
+    // helpers
+    var toString = Object.prototype.toString;
+
+    // test if object
+    var isObject = function (arg) {
+        return toString.call(arg) === '[object Object]';
+    };
+
+    var mostRecentWorkingDay = function () {
+        var currentDate = moment(moment().format("YYYY-MM-DD"));
+        if (currentDate.isoWeekday() === 7) {
+            currentDate.subtract(2, 'days');
+        } else if (currentDate.isoWeekday() === 6) {
+            currentDate.subtract(1, 'days');
+        }
+        return currentDate;
     };
 
     function downloadData(symbol, fromDate, toDate) {
@@ -53,7 +172,7 @@
         var columnAliases = "date,open,high,low,close,volume,adjclose";
         var query = "select " + columns + " from csv where url='" + url + "' and columns='" + columnAliases + "'";
 
-        var returnData;
+        var returnData = [];
         var jqXHR = $.ajax("http://query.yahooapis.com/v1/public/yql", {
             data: {
                 q: query,
@@ -66,15 +185,15 @@
             crossDomain: true
         }).done(function(data) {
             if (data.query.results !== undefined && data.query.results.row !== undefined) {
-                if (data.query.results.row.length > 0) {
+                if (data.query.results.row.length > 1) {
                     data.query.results.row.shift(); // remove descriptions
                     var from = data.query.results.row[data.query.results.row.length - 1];
                     var to = data.query.results.row[0];
                     log.debug("Historical prices between date " + from.date + " to " + to.date + " (" + from.close + " to " + to.close + ") received");
+                    log.debug("data.query.results.row", data.query.results.row);
+                    returnData = data.query.results.row;
                 }
             }
-            log.debug("data.query.results.row", data.query.results.row);
-            returnData = data.query.results.row;
 
             if (data.query.diagnostics.csv !== undefined) {
                 log.warn("diagnostics.cvs = " + data.query.diagnostics.csv);
@@ -86,48 +205,18 @@
                     var recursiveToDate = moment(from.date).subtract('days', 1);
                     Array.prototype.push.apply(returnData, downloadData(symbol, fromDate, recursiveToDate));
                 } else {
-                    log.warn("diagnostics.warning = " + data.query.diagnostics.warning);
+                    alert("diagnostics.warning = " + data.query.diagnostics.warning);
                 }
             }
         }).fail(function() {
-            alert( "Error downloading data" );
+            alert("Error downloading data");
         }).always(function() {
 
         });
 
         return returnData;
-    }
-
-    // create `fn` alias to `prototype` property
-    finance.fn = finance.prototype = {};
-
-    /**
-     * Get the symbol price
-     *
-     * @return     {Array}    the Symbol Price
-     */
-    finance.fn.data = function () {
-        var start = moment().valueOf();
-        var fromDate = moment("1900-01-01");
-        var toDate = moment();
-        this._data = downloadData(this._symbol, fromDate, toDate);
-        var stop = moment().valueOf();
-        var executionTime = stop - start;
-        log.debug("Downloading data took " + executionTime + " milliseconds");
-        return this._data;
-    };
-
-    /**
-     * Get the Symbol Volume
-     *
-     * @return     {Array}    the Symbol Volume
-     */
-    finance.fn.volume = function () {
-        return this._volume;
-    };
-
-    // expose the library
-    window.finance = finance;
+    }    
+    
 })();
 
 var log = log4javascript.getDefaultLogger();
@@ -138,4 +227,6 @@ consoleAppender.setThreshold(log4javascript.Level.DEBUG);
 log.setLevel(log4javascript.Level.TRACE);
 log.trace("Document Ready");
 
+finance({symbol: "^VIX"}).clearDataCache();
 log.info(finance({symbol: "^VIX"}).data());
+//alert(simpleStorage.storageSize());
