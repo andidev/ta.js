@@ -856,7 +856,14 @@ $(function() {
                     }
                 }
             });
-            $("#symbol").select2("val", self.symbol());
+            $("#symbol").select2("val", self.symbol()).on("select2-close", function () {
+                setTimeout(function () {
+                    $('.select2-container-active').removeClass('select2-container-active');
+                    // Manually blur search input on close to let placeholder reappear
+                    // See https://github.com/ivaynberg/select2/issues/1545
+                    $(':focus').blur();
+                }, 1);
+            });
             $("#symbol").on("change", function(event) {
                 self.symbol(event.val);
                 self.downloadData(function(data) {
