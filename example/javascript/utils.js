@@ -26,7 +26,7 @@ function defaultNumberValue(defaultValue, data) {
 }
 
 function scaleToWeek(data) {
-    var scaledData = [0];
+    var scaledData = [];
     var currentWeek = data[0][0].isoWeek();
     var currentWeekIndex = 0;
     $.each(data, function(index, value) {
@@ -44,7 +44,7 @@ function scaleToWeek(data) {
 }
 
 function scaleToMonth(data) {
-    var scaledData = [0];
+    var scaledData = [];
     var currentMonth = data[0][0].month();
     var currentMonthIndex = 0;
     $.each(data, function(index, value) {
@@ -62,7 +62,7 @@ function scaleToMonth(data) {
 }
 
 function scaleToYear(data) {
-    var scaledData = [0];
+    var scaledData = [];
     var currentYear = data[0][0].year();
     var currentYearIndex = 0;
     $.each(data, function(index, value) {
