@@ -69,25 +69,30 @@
     };
 
     /**
-     * Get the cached symbol data in localeStorage
+     * Get the cached symbol data in localStorage
      *
      * @param      {Object}   data
      */
     yahooFinance.fn.getDataCache = function () {
-        return simpleStorage.get(dataCacheKeyNameSpace + this.symbol);
+        var dataCache = localStorage.getItem(dataCacheKeyNameSpace + this.symbol);
+        if (dataCache !== undefined || dataCache !== null) {
+            return JSON.parse(dataCache);
+        } else {
+            return null;
+        }
     };
 
     /**
-     * Set the cached symbol data in localeStorage
+     * Set the cached symbol data in localStorage
      *
      * @param      {Object}   data
      */
     yahooFinance.fn.setDataCache = function (data) {
-        simpleStorage.set(dataCacheKeyNameSpace + this.symbol, data);
+        localStorage.setItem(dataCacheKeyNameSpace + this.symbol, JSON.stringify(data));
     };
 
     /**
-     * Append data to the cached symbol data in localeStorage
+     * Append data to the cached symbol data in localStorage
      * 
      * @param      {Object}   data to append
      */
@@ -97,22 +102,22 @@
     };
 
     /**
-     * Clear the currently cached symbol data from localeStorage
+     * Clear the currently cached symbol data from localStorage
      * @return     {yahooFinance} returns the yahooFinance object
      */
     yahooFinance.fn.clearDataCache = function () {
-        simpleStorage.deleteKey(dataCacheKeyNameSpace + this.symbol);
+        localStorage.removeItem(dataCacheKeyNameSpace + this.symbol);
         return this;
     };
 
     /**
-     * Check if cached symbol data in localeStorage does not exist
+     * Check if cached symbol data in localStorage does not exist
      *
      * @return     {boolean} true if the data cache is empty
      */
     yahooFinance.fn.isDataCacheEmpty = function () {
         log.trace("Is data cache empty?");
-        if (this.getDataCache() === undefined || this.getDataCache() === null) {
+        if (this.getDataCache() === null) {
             log.trace("Yes", dataCacheKeyNameSpace + this.symbol,  this.getDataCache());
             return true;
         } else {
@@ -122,7 +127,7 @@
     };
 
     /**
-     * Check if cached symbol data in localeStorage needs to be updated
+     * Check if cached symbol data in localStorage needs to be updated
      *
      * @return     {boolean} true if the data cache needs to be updated
      */
@@ -130,10 +135,10 @@
         log.trace("Is data cache out of date?");
         var lastDataCacheDate = moment(this.getDataCache()[0].date);
         if (lastDataCacheDate.isBefore(mostRecentWorkingDay())) {
-            log.trace("Yes");
+            log.trace("Yes", dataCacheKeyNameSpace + this.symbol,  this.getDataCache());
             return true;
         } else {
-            log.trace("No");
+            log.trace("No", dataCacheKeyNameSpace + this.symbol,  this.getDataCache());
             return false;
         }
     };
