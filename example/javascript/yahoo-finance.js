@@ -1,31 +1,38 @@
 (function () {
 
-    var finance = function (arg1) { // core constructor
-        // ensure to use the `new` operator
-        if (!(this instanceof finance)) {
-            return new finance(arg1);
+    // Constructor
+    var yahooFinance = function (symbol) {
+        // Ensure to use the `new` operator
+        if (!(this instanceof yahooFinance)) {
+            return new yahooFinance(symbol);
         }
 
-        // if first argument is an array
-        if (isObject(arg1) && arg1.symbol !== undefined) {
-            this.symbol = arg1.symbol;
-            this.dataCacheKey = "dataCache." + arg1.symbol;
-        // unexpected argument value, return empty finance object
+        // Check the argument
+        if (typeof symbol === 'string' || symbol instanceof String) {
+            // Save symbol if first argument is a String
+            this.symbol = symbol;
         } else {
-            throw "First argument must be an object containing a symbol";
+            // Invalid argument value
+            throw "First argument must be a String containing a yahoo symbol, search for available symbols at http://finance.yahoo.com/lookup";
         }
+        
         return this;
     };
 
+    // make library public
+    window.yahooFinance = yahooFinance;
+
     // create `fn` alias to `prototype` property
-    finance.fn = finance.prototype = {};
+    yahooFinance.fn = yahooFinance.prototype = {};
+
+    // Public methods
 
     /**
-     * Get the symbol data (downloads it from yahoo finance)
+     * Get the symbol data from cache if it exists or download it if it's not cached yet
      *
-     * @return     {Array} the symbol data
+     * @return     {Object} the symbol data
      */
-    finance.fn.data = function () {
+    yahooFinance.fn.getData = function () {
         try {
             if (this.isDataCacheEmpty()) {
                 var fromDate = moment("1900-01-01");
@@ -35,7 +42,9 @@
                 var stop = moment().valueOf();
                 var executionTime = stop - start;
                 log.debug("Downloading data took " + executionTime + " milliseconds");
+                log.trace("Saving data to cache", downloadedData);
                 this.setDataCache(downloadedData);
+                log.trace("Data saved to cache", dataCacheKeyNameSpace + this.symbol, this.getDataCache());
             } else if (this.isDataCacheOutOfDate()) {
                 var fromDate = moment(this.getDataCache()[0].date).add(1, 'day');
                 var toDate = mostRecentWorkingDay();
@@ -45,7 +54,9 @@
                 var executionTime = stop - start;
                 log.debug("Downloading data took " + executionTime + " milliseconds");
                 if (downloadedData.length > 0) {
+                    log.trace("Updating chached data", downloadedData);
                     this.appendDataCache(downloadedData);
+                    log.trace("Data saved to cache", dataCacheKeyNameSpace + this.symbol, this.getDataCache());
                 }
             }
 
@@ -62,8 +73,8 @@
      *
      * @param      {Object}   data
      */
-    finance.fn.getDataCache = function () {
-        return simpleStorage.get(this.dataCacheKey);
+    yahooFinance.fn.getDataCache = function () {
+        return simpleStorage.get(dataCacheKeyNameSpace + this.symbol);
     };
 
     /**
@@ -71,26 +82,26 @@
      *
      * @param      {Object}   data
      */
-    finance.fn.setDataCache = function (data) {
-        simpleStorage.set(this.dataCacheKey, data);
+    yahooFinance.fn.setDataCache = function (data) {
+        simpleStorage.set(dataCacheKeyNameSpace + this.symbol, data);
     };
 
     /**
      * Append data to the cached symbol data in localeStorage
+     * 
      * @param      {Object}   data to append
      */
-    finance.fn.appendDataCache = function (data) {
+    yahooFinance.fn.appendDataCache = function (data) {
         Array.prototype.push.apply(data, this.getDataCache());
         this.setDataCache(data);
     };
 
     /**
      * Clear the currently cached symbol data from localeStorage
-     * @return     {finance} returns this finance object
+     * @return     {yahooFinance} returns the yahooFinance object
      */
-    finance.fn.clearDataCache = function () {
-        log.debug("Clearing cached symbol data from localeStorage for symbol " + this.symbol);
-        simpleStorage.deleteKey(this.dataCacheKey);
+    yahooFinance.fn.clearDataCache = function () {
+        simpleStorage.deleteKey(dataCacheKeyNameSpace + this.symbol);
         return this;
     };
 
@@ -99,10 +110,13 @@
      *
      * @return     {boolean} true if the data cache is empty
      */
-    finance.fn.isDataCacheEmpty = function () {
-        if (this.getDataCache() === undefined) {
+    yahooFinance.fn.isDataCacheEmpty = function () {
+        log.trace("Is data cache empty?");
+        if (this.getDataCache() === undefined || this.getDataCache() === null) {
+            log.trace("Yes", dataCacheKeyNameSpace + this.symbol,  this.getDataCache());
             return true;
         } else {
+            log.trace("No");
             return false;
         }
     };
@@ -110,29 +124,22 @@
     /**
      * Check if cached symbol data in localeStorage needs to be updated
      *
-     * @param      {Object}   data
      * @return     {boolean} true if the data cache needs to be updated
      */
-    finance.fn.isDataCacheOutOfDate = function (data) {
+    yahooFinance.fn.isDataCacheOutOfDate = function () {
+        log.trace("Is data cache out of date?");
         var lastDataCacheDate = moment(this.getDataCache()[0].date);
         if (lastDataCacheDate.isBefore(mostRecentWorkingDay())) {
+            log.trace("Yes");
             return true;
         } else {
+            log.trace("No");
             return false;
         }
     };
 
-    // expose the library
-    window.finance = finance;
-
-
-    // helpers
-    var toString = Object.prototype.toString;
-
-    // test if object
-    var isObject = function (arg) {
-        return toString.call(arg) === '[object Object]';
-    };
+    // Private methods
+    var dataCacheKeyNameSpace = "yahooFinance.dataCache.";
 
     var mostRecentWorkingDay = function () {
         var currentDate = moment(moment().format("YYYY-MM-DD"));

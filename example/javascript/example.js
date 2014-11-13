@@ -882,7 +882,7 @@ $(function() {
 
         self.downloadData = function(callback) {
             log.debug("Downloading data for symbol " + self.symbol());
-            var data = convertToFlotFormat(finance({symbol: self.symbol()}).data());
+            var data = convertToFlotFormat(yahooFinance(self.symbol()).getData());
             callback(data);
         };
 

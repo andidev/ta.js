@@ -14,13 +14,15 @@
         <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/log4javascript/1.4.3/log4javascript.js"></script>
         <script type="text/javascript" src="javascript/log4javascript-config.js"></script>
         <script type="text/javascript" src="javascript/simplestorage.js"></script>
-        <script type="text/javascript" src="javascript/yahoo-finance-utils.js"></script>
+        <script type="text/javascript" src="javascript/yahoo-finance.js"></script>
         <script type="text/javascript" src="http://localhost:35729/livereload.js"></script>
 
         <script type="text/javascript">
             $(document).ready(function () {
-//                finance({symbol: "^VIX"}).clearDataCache();
-                log.info(finance({symbol: "^OMX"}).data());
+//                yahooFinance("PXX.TO").clearDataCache();
+                log.info(yahooFinance("PXX.TO").getDataCache());
+                log.info(yahooFinance("PXX.TO").getData());
+                log.info(yahooFinance("PXX.TO").getDataCache());
 //                alert(simpleStorage.storageSize());
             });
         </script>
