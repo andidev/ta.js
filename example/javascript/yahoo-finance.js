@@ -106,7 +106,7 @@
      * @return     {yahooFinance} returns the yahooFinance object
      */
     yahooFinance.fn.clearDataCache = function () {
-        localStorage.removeItem(dataCacheKeyNameSpace + this.symbol);
+        localStorage.clear();
         return this;
     };
 
