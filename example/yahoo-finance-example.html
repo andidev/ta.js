@@ -18,11 +18,10 @@
 
         <script type="text/javascript">
             $(document).ready(function () {
-//                localStorage.clear();
-                var pxx = yahooFinance("PXX.TO");
-//                pxx.clearDataCache();
-                log.info(pxx.getData());
-                log.info(pxx.getDataCache());
+                var symbol = yahooFinance("PXX.TO");
+//                symbol.clearDataCache();
+                log.info(symbol.getData());
+                log.info(symbol.getDataCache());
             });
         </script>
 
