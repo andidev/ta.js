@@ -44,8 +44,8 @@
                 log.debug("Downloading data took " + executionTime + " milliseconds");
                 log.trace("Saving data to cache", downloadedData);
                 this.setDataCache(downloadedData);
-                log.trace("Data saved to cache", dataCacheKeyNameSpace + this.symbol, this.getDataCache());
-            } else if (this.isDataCacheOutOfDate()) {
+                log.trace("Data saved to cache", dataCacheKeyNameSpace + this.symbol + ".data", this.getDataCache());
+            } else if (this.isDataCacheOutOfDate() && !this.isDataCacheCheckThrotteled()) {
                 var fromDate = moment(this.getDataCache()[0].date).add(1, 'day');
                 var toDate = mostRecentWorkingDay();
                 var start = moment().valueOf();
@@ -56,7 +56,7 @@
                 if (downloadedData.length > 0) {
                     log.trace("Updating chached data", downloadedData);
                     this.appendDataCache(downloadedData);
-                    log.trace("Data saved to cache", dataCacheKeyNameSpace + this.symbol, this.getDataCache());
+                    log.trace("Data saved to cache", dataCacheKeyNameSpace + this.symbol + ".data", this.getDataCache());
                 }
             }
 
@@ -74,7 +74,7 @@
      * @param      {Object}   data
      */
     yahooFinance.fn.getDataCache = function () {
-        var dataCache = localStorage.getItem(dataCacheKeyNameSpace + this.symbol);
+        var dataCache = localStorage.getItem(dataCacheKeyNameSpace + this.symbol + ".data");
         if (dataCache !== undefined || dataCache !== null) {
             return JSON.parse(dataCache);
         } else {
@@ -88,7 +88,7 @@
      * @param      {Object}   data
      */
     yahooFinance.fn.setDataCache = function (data) {
-        localStorage.setItem(dataCacheKeyNameSpace + this.symbol, JSON.stringify(data));
+        localStorage.setItem(dataCacheKeyNameSpace + this.symbol + ".data", JSON.stringify(data));
     };
 
     /**
@@ -118,7 +118,7 @@
     yahooFinance.fn.isDataCacheEmpty = function () {
         log.trace("Is data cache empty?");
         if (this.getDataCache() === null) {
-            log.trace("Yes", dataCacheKeyNameSpace + this.symbol,  this.getDataCache());
+            log.trace("Yes", dataCacheKeyNameSpace + this.symbol + ".data",  this.getDataCache());
             return true;
         } else {
             log.trace("No");
@@ -135,16 +135,34 @@
         log.trace("Is data cache out of date?");
         var lastDataCacheDate = moment(this.getDataCache()[0].date);
         if (lastDataCacheDate.isBefore(mostRecentWorkingDay())) {
-            log.trace("Yes", dataCacheKeyNameSpace + this.symbol,  this.getDataCache());
+            log.trace("Yes", dataCacheKeyNameSpace + this.symbol + ".data",  this.getDataCache());
             return true;
         } else {
-            log.trace("No", dataCacheKeyNameSpace + this.symbol,  this.getDataCache());
+            log.trace("No", dataCacheKeyNameSpace + this.symbol + ".data",  this.getDataCache());
             return false;
         }
     };
 
+    /**
+     * Check if the data cache check is throttled
+     *
+     * @return     {boolean} true if the data cache check is throttled
+     */
+    yahooFinance.fn.isDataCacheCheckThrotteled = function () {
+        log.trace("Is data cache check throtteled?");
+        var lastDataCacheCheckDate = localStorage.getItem(dataCacheKeyNameSpace + this.symbol + ".lastDataCacheCheckDate");
+        if (lastDataCacheCheckDate === null || lastDataCacheCheckDate === undefined || moment(lastDataCacheCheckDate).isBefore(moment().subtract(1, "hours"))) {
+            log.trace("No", lastDataCacheCheckDate);
+            localStorage.setItem(dataCacheKeyNameSpace + this.symbol + ".lastDataCacheCheckDate", moment().toString());
+            return false;
+        } else {
+            log.trace("Yes", lastDataCacheCheckDate);
+            return true;
+        }
+    };
+
     // Private methods
-    var dataCacheKeyNameSpace = "yahooFinance.dataCache.";
+    var dataCacheKeyNameSpace = "yahooFinance.";
 
     var mostRecentWorkingDay = function () {
         var currentDate = moment(moment().format("YYYY-MM-DD"));
