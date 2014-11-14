@@ -208,7 +208,7 @@
             }
 
             if (data.query.diagnostics.csv !== undefined) {
-                log.warn("diagnostics.cvs = " + data.query.diagnostics.csv);
+                log.warn("diagnostics.cvs = " + data.query.diagnostics.csv, data);
             }
             if (data.query.diagnostics.warning !== undefined) {
                 if (data.query.diagnostics.warning === "You have reached the maximum number of items which can be returned in a request") {
@@ -217,6 +217,7 @@
                     var recursiveToDate = moment(from.date).subtract('days', 1);
                     Array.prototype.push.apply(returnData, downloadData(symbol, fromDate, recursiveToDate));
                 } else {
+                    log.warn("diagnostics.warning = " + data.query.diagnostics.warning, data);
                     alert("diagnostics.warning = " + data.query.diagnostics.warning);
                 }
             }
