@@ -75,7 +75,7 @@
         return function () {
             var key = this.symbol + JSON.stringify(Array.prototype.slice.call(arguments));
             if (key in cache) {
-                log.trace('Loading from cache ' + key, cache[key], cache);
+                log.debug('Loading from cache ' + key, cache[key], cache);
                 return cache[key];
             } else {
                 var data = f.apply(this, arguments);
