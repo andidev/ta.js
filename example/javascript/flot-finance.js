@@ -157,10 +157,10 @@
 
     /**
      * Convert Yahoo Finance format to Flot format
-     * 
+     *
      * @param {type} data received from yahooFinance(symbol).getData() call
      * @param {type} column to use (available columns open, high, low, close, volume, adjclose)
-     * 
+     *
      * @returns {Array}
      */
     var convertYahooFinanceToFlotFormat = function (data, column) {
