@@ -78,3 +78,18 @@ function scaleToYear(data) {
     });
     return scaledData;
 }
+
+
+function scaleTo(scale, data) {
+    switch (scale) {
+        case "day":
+            // Keep original day scale
+            return data;
+        case "week":
+            return scaleToWeek(data);
+        case "month":
+            return scaleToMonth(data);
+        case "year":
+            return scaleToYear(data);
+    }
+}

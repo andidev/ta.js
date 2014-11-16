@@ -35,8 +35,9 @@
     yahooFinance.fn.getData = function () {
         try {
             if (this.isDataCacheEmpty()) {
-                var fromDate = moment("1900-01-01");
+                var fromDate = moment("1900-01-01", "YYYY-MM-DD");
                 var toDate = mostRecentWorkingDay();
+                log.debug("Dowloading data from " + fromDate.format("YYYY-MM-DD") + " to " + toDate.format("YYYY-MM-DD"));
                 var start = moment().valueOf();
                 var downloadedData = downloadData(this.symbol, fromDate, toDate);
                 var stop = moment().valueOf();
@@ -45,22 +46,30 @@
                 log.trace("Saving data to cache", downloadedData);
                 this.setDataCache(downloadedData);
                 log.trace("Data saved to cache", dataCacheKeyNameSpace + this.symbol + ".data", this.getDataCache());
-            } else if (this.isDataCacheOutOfDate() && !this.isDataCacheCheckThrotteled()) {
+                return this.getDataCache();                
+            } else if (this.isDataCacheOutOfDate()) {
+                if (this.isDataCacheCheckThrotteled()) {
+                    log.debug("Dowloading data not needed (throtteled), using data found in cache");
+                    return this.getDataCache();
+                }
                 var fromDate = moment(this.getDataCache()[0].date).add(1, 'day');
                 var toDate = mostRecentWorkingDay();
+                log.debug("Dowloading outdated data from " + fromDate.format("YYYY-MM-DD") + " to " + toDate.format("YYYY-MM-DD"));
                 var start = moment().valueOf();
                 var downloadedData = downloadData(this.symbol, fromDate, toDate);
                 var stop = moment().valueOf();
                 var executionTime = stop - start;
-                log.debug("Downloading data took " + executionTime + " milliseconds");
+                log.debug("Downloading outdated data took " + executionTime + " milliseconds");
                 if (downloadedData.length > 0) {
                     log.trace("Updating chached data", downloadedData);
                     this.appendDataCache(downloadedData);
                     log.trace("Data saved to cache", dataCacheKeyNameSpace + this.symbol + ".data", this.getDataCache());
                 }
+                return this.getDataCache();                
+            } else {
+                log.debug("Dowloading data not needed, using data found in cache");
+                return this.getDataCache();                
             }
-
-            return this.getDataCache();
         } catch (e) {
             alert("Something went wrong. Clearing symbol data cache for symbol = " + this.symbol + " for safety");
             this.clearDataCache();
@@ -153,7 +162,7 @@
         var lastDataCacheCheckDate = localStorage.getItem(dataCacheKeyNameSpace + this.symbol + ".lastDataCacheCheckDate");
         if (lastDataCacheCheckDate === null || lastDataCacheCheckDate === undefined || moment(lastDataCacheCheckDate).isBefore(moment().subtract(1, "hours"))) {
             log.trace("No", lastDataCacheCheckDate);
-            localStorage.setItem(dataCacheKeyNameSpace + this.symbol + ".lastDataCacheCheckDate", moment().toString());
+            localStorage.setItem(dataCacheKeyNameSpace + this.symbol + ".lastDataCacheCheckDate", moment().toISOString());
             return false;
         } else {
             log.trace("Yes", lastDataCacheCheckDate);
@@ -219,8 +228,7 @@
                     data.query.results.row.shift(); // remove descriptions
                     var from = data.query.results.row[data.query.results.row.length - 1];
                     var to = data.query.results.row[0];
-                    log.debug("Historical prices between date " + from.date + " to " + to.date + " (" + from.close + " to " + to.close + ") received");
-                    log.debug("data.query.results.row", data.query.results.row);
+                    log.debug("Historical prices between date " + from.date + " to " + to.date + " (" + from.close + " to " + to.close + ") received", data.query.results.row);
                     returnData = data.query.results.row;
                 }
             }
@@ -230,9 +238,8 @@
             }
             if (data.query.diagnostics.warning !== undefined) {
                 if (data.query.diagnostics.warning === "You have reached the maximum number of items which can be returned in a request") {
-                    log.debug("Was not able to receive all data in on call");
-                    log.debug("Calling downloadData recursively to download the rest of the data");
-                    var recursiveToDate = moment(from.date).subtract('days', 1);
+                    log.debug("Was not able to receive all data in call, trying again");
+                    var recursiveToDate = moment(from.date).subtract(1, 'days');
                     Array.prototype.push.apply(returnData, downloadData(symbol, fromDate, recursiveToDate));
                 } else {
                     log.warn("diagnostics.warning = " + data.query.diagnostics.warning, data);

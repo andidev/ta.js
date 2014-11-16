@@ -15,7 +15,7 @@
         <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/jquery-ui.css"/>
         <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.0/jquery.cookie.min.js"></script>
         <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
-        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js"></script>
         <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/numeral.js/1.5.2/numeral.min.js"></script>
         <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
         <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.1/jquery.flot.min.js"></script>
@@ -34,8 +34,8 @@
         <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/2.0.0/css/bootstrap-switch.min.css"/>
         <script type="text/javascript" src="javascript/bootstrap-slider.js"></script>
         <link rel="stylesheet" type="text/css" href="css/bootstrap-slider.css"/>
-        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap-editable/js/bootstrap-editable.js"></script>
-        <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css"/>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.1/bootstrap-editable/js/bootstrap-editable.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.1/bootstrap3-editable/css/bootstrap-editable.css"/>
         <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery-url-parser/2.3.1/purl.js"></script>
         <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/log4javascript/1.4.3/log4javascript.js"></script>
         <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css"/>
@@ -45,6 +45,7 @@
         <script type="text/javascript" src="javascript/numeral-utils.js"></script>
         <script type="text/javascript" src="javascript/knockout-utils.js"></script>
         <script type="text/javascript" src="javascript/yahoo-finance.js"></script>
+        <script type="text/javascript" src="javascript/flot-finance.js"></script>
         <script type="text/javascript" src="javascript/flot-utils.js"></script>
         <script type="text/javascript" src="javascript/utils.js"></script>
         <script type="text/javascript" src="javascript/example.js"></script>
@@ -158,16 +159,16 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-keep-open" role="menu" style="width:200px;">
                                         <li>
-                                            <a href="#" class="clearfix" data-bind="click: changeScaleToDay">Day <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'day'}"></i></a>
+                                            <a href="#" class="clearfix" data-bind="click: changeScaleToDay">Days <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'days'}"></i></a>
                                         </li>
                                         <li>
-                                            <a href="#" class="clearfix" data-bind="click: changeScaleToWeek">Week <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'week'}"></i></a>
+                                            <a href="#" class="clearfix" data-bind="click: changeScaleToWeek">Weeks <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'weeks'}"></i></a>
                                         </li>
                                         <li>
-                                            <a href="#" class="clearfix" data-bind="click: changeScaleToMonth">Month <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'month'}"></i></a>
+                                            <a href="#" class="clearfix" data-bind="click: changeScaleToMonth">Months <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'months'}"></i></a>
                                         </li>
                                         <li>
-                                            <a href="#" class="clearfix" data-bind="click: changeScaleToYear">Year <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'year'}"></i></a>
+                                            <a href="#" class="clearfix" data-bind="click: changeScaleToYear">Years <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'years'}"></i></a>
                                         </li>
                                         <li>
                                             <a href="#" class="clearfix" data-bind="click: changeScaleToAuto">Auto <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'auto'}"></i></a>

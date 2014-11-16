@@ -134,10 +134,10 @@ $(function() {
             }
 
         });
-        self.enableSplitDetection = ko.observable(defaultBooleanValue(true, url.param("enableSplitDetection")));
-        self.scale = ko.observable(defaultValue("day", url.param("scale")));
+        self.enableSplitDetection = ko.observable(defaultBooleanValue(false, url.param("enableSplitDetection")));
+        self.scale = ko.observable(defaultValue("days", url.param("scale")));
         self.timePeriod = ko.observable(defaultValue("3years", url.param("timePeriod")));
-        self.zoomHistory = ko.observableArray();
+        self.zoomHistory = ko.observableArray([]);
         self.toDate = ko.observable();
         self.formattedToDate = ko.computed(function() {
             if (self.toDate() === undefined) {
@@ -267,47 +267,47 @@ $(function() {
         // Behaviors
         self.changeScaleToAuto = function() {
             if (self.scale() !== "auto") {
-                log.debug("Changing scale to Auto");
+                log.info("Changing scale to Auto");
                 self.scale("auto");
-                self.processData();
+                self.downloadAndProcessData();
                 self.plot();
             }
         };
         self.changeScaleToDay = function() {
-            if (self.scale() !== "day") {
-                log.debug("Changing scale to Day");
-                self.scale("day");
-                self.processData();
+            if (self.scale() !== "days") {
+                log.info("Changing scale to Days");
+                self.scale("days");
+                self.downloadAndProcessData();
                 self.plot();
             }
         };
         self.changeScaleToWeek = function() {
-            if (self.scale() !== "week") {
-                log.debug("Changing scale to Week");
-                self.scale("week");
-                self.processData();
+            if (self.scale() !== "weeks") {
+                log.info("Changing scale to Weeks");
+                self.scale("weeks");
+                self.downloadAndProcessData();
                 self.plot();
             }
         };
         self.changeScaleToMonth = function() {
-            if (self.scale() !== "month") {
-                log.debug("Changing scale to Month");
-                self.scale("month");
-                self.processData();
+            if (self.scale() !== "months") {
+                log.info("Changing scale to Months");
+                self.scale("months");
+                self.downloadAndProcessData();
                 self.plot();
             }
         };
         self.changeScaleToYear = function() {
-            if (self.scale() !== "year") {
-                log.debug("Changing scale to Year");
-                self.scale("year");
-                self.processData();
+            if (self.scale() !== "years") {
+                log.info("Changing scale to Years");
+                self.scale("years");
+                self.downloadAndProcessData();
                 self.plot();
             }
         };
 
         self.changeTimePeriodToAll = function() {
-            log.debug("Changing time period to All");
+            log.info("Changing time period to All");
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
@@ -319,7 +319,7 @@ $(function() {
             self.plot();
         };
         self.changeTimePeriodTo10Years = function() {
-            log.debug("Changing time period to 10 Years");
+            log.info("Changing time period to 10 Years");
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
@@ -331,7 +331,7 @@ $(function() {
             self.plot();
         };
         self.changeTimePeriodTo3Years = function() {
-            log.debug("Changing time period to 3 Years");
+            log.info("Changing time period to 3 Years");
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
@@ -343,7 +343,7 @@ $(function() {
             self.plot();
         };
         self.changeTimePeriodToYear = function() {
-            log.debug("Changing time period to Year");
+            log.info("Changing time period to Year");
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
@@ -355,7 +355,7 @@ $(function() {
             self.plot();
         };
         self.changeTimePeriodTo3Months = function() {
-            log.debug("Changing time period to 3 Month");
+            log.info("Changing time period to 3 Month");
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
@@ -367,7 +367,7 @@ $(function() {
             self.plot();
         };
         self.changeTimePeriodToMonth = function() {
-            log.debug("Changing time period to Month");
+            log.info("Changing time period to Month");
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
@@ -379,7 +379,7 @@ $(function() {
             self.plot();
         };
         self.changeTimePeriodToWeek = function() {
-            log.debug("Changing time period to Week");
+            log.info("Changing time period to Week");
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
@@ -393,41 +393,41 @@ $(function() {
 
         self.toggleSplitDetection = function() {
             if (self.enableSplitDetection() === false) {
-                log.debug("Enabling Split Detection");
+                log.info("Enabling Split Detection");
                 self.enableSplitDetection(true);
             } else {
-                log.debug("Disabling Split Detection");
+                log.info("Disabling Split Detection");
                 self.enableSplitDetection(false);
             }
-            self.processData();
+            self.downloadAndProcessData();
             self.plot();
         };
         self.toggleMa5Ma14 = function() {
             if (self.showMa5Ma14() === true) {
-                log.debug("Hiding MA5/MA14");
+                log.info("Hiding MA5/MA14");
                 self.showMa5Ma14(false);
             } else {
-                log.debug("Showing MA5/MA14");
+                log.info("Showing MA5/MA14");
                 self.showMa5Ma14(true);
             }
             self.plot();
         };
         self.toggleMa50Ma100Ma200 = function() {
             if (self.showMa50Ma100Ma200() === true) {
-                log.debug("Hiding MA50/MA100/MA200");
+                log.info("Hiding MA50/MA100/MA200");
                 self.showMa50Ma100Ma200(false);
             } else {
-                log.debug("Showing MA50/MA100/MA200");
+                log.info("Showing MA50/MA100/MA200");
                 self.showMa50Ma100Ma200(true);
             }
             self.plot();
         };
         self.toggleMacd = function() {
             if (self.showMacd() === true) {
-                log.debug("Hiding MACD 12,26,9");
+                log.info("Hiding MACD 12,26,9");
                 self.showMacd(false);
             } else {
-                log.debug("Showing MACD 12,26,9");
+                log.info("Showing MACD 12,26,9");
                 self.showMacd(true);
             }
             self.plot();
@@ -435,9 +435,10 @@ $(function() {
 
 
         self.slideMaFastest = function(viewModel, event, ranges) {
-            log.debug("Sliding MA Fastest");
+            log.trace("Sliding MA Fastest");
             var newDatumPoints = event.value;
             if (self.maFastestDatumPoints() !== newDatumPoints) {
+                log.info("Updating MA Fastest to MA" + newDatumPoints);
                 self.maFastestDatumPoints(newDatumPoints);
                 var priceTA = TA(getPricesAsArray(self.price().data));
                 self.maFastest().data = convertToFlotFormat(priceTA.ma(newDatumPoints).asArray(), self.price().data);
@@ -446,9 +447,10 @@ $(function() {
             }
         };
         self.slideMaFast = function(viewModel, event, ranges) {
-            log.debug("Sliding MA Fast");
+            log.trace("Sliding MA Fast");
             var newDatumPoints = event.value;
             if (self.maFastDatumPoints() !== newDatumPoints) {
+                log.info("Updating MA Fast to MA" + newDatumPoints);
                 self.maFastDatumPoints(newDatumPoints);
                 var priceTA = TA(getPricesAsArray(self.price().data));
                 self.maFast().data = convertToFlotFormat(priceTA.ma(newDatumPoints).asArray(), self.price().data);
@@ -457,9 +459,10 @@ $(function() {
             }
         };
         self.slideMaSlow = function(viewModel, event, ranges) {
-            log.debug("Sliding MA Slow");
+            log.trace("Sliding MA Slow");
             var newDatumPoints = event.value;
             if (self.maSlowDatumPoints() !== newDatumPoints) {
+                log.info("Updating MA Slow to MA" + newDatumPoints);
                 self.maSlowDatumPoints(newDatumPoints);
                 var priceTA = TA(getPricesAsArray(self.price().data));
                 self.maSlow().data = convertToFlotFormat(priceTA.ma(newDatumPoints).asArray(), self.price().data);
@@ -468,9 +471,10 @@ $(function() {
             }
         };
         self.slideMaSlower = function(viewModel, event, ranges) {
-            log.debug("Sliding MA Slower");
+            log.trace("Sliding MA Slower");
             var newDatumPoints = event.value;
             if (self.maSlowerDatumPoints() !== newDatumPoints) {
+                log.info("Updating MA Slower to MA" + newDatumPoints);
                 self.maSlowerDatumPoints(newDatumPoints);
                 var priceTA = TA(getPricesAsArray(self.price().data));
                 self.maSlower().data = convertToFlotFormat(priceTA.ma(newDatumPoints).asArray(), self.price().data);
@@ -479,9 +483,10 @@ $(function() {
             }
         };
         self.slideMaSlowest = function(viewModel, event, ranges) {
-            log.debug("Sliding MA Slowest");
+            log.trace("Sliding MA Slowest");
             var newDatumPoints = event.value;
             if (self.maSlowestDatumPoints() !== newDatumPoints) {
+                log.info("Updating MA Slowest to MA" + newDatumPoints);
                 self.maSlowestDatumPoints(newDatumPoints);
                 var priceTA = TA(getPricesAsArray(self.price().data));
                 self.maSlowest().data = convertToFlotFormat(priceTA.ma(newDatumPoints).asArray(), self.price().data);
@@ -516,7 +521,7 @@ $(function() {
         self.changeFromDate = function(viewModel, event) {
             var isFromDateUpdated = !moment(event.date).isSame(self.fromDate());
             if (isFromDateUpdated) {
-                log.debug("Changing From Date");
+                log.info("Changing From Date to " + formatDate(moment(event.date)));
                 self.updateFromDate(moment(event.date));
                 self.timePeriod("custom");
                 self.plot();
@@ -525,7 +530,7 @@ $(function() {
         self.changeToDate = function(viewModel, event) {
             var isToDateUpdated = !moment(event.date).isSame(self.toDate());
             if (isToDateUpdated) {
-                log.debug("Changing To Date");
+                log.info("Changing To Date to " + formatDate(moment(event.date)));
                 self.updateToDate(moment(event.date));
                 self.timePeriod("custom");
                 self.plot();
@@ -535,15 +540,15 @@ $(function() {
         self.zoomSelectionFrom;
         self.zoomSelectionTo;
         self.mouseDown = function(viewModel, event) {
-            log.debug("Mouse key pressed, which = " + event.which);
+            log.trace("Mouse key pressed, which = " + event.which);
             if (event.which === 1) {
-                log.debug("Left mouse key pressed");
+                log.trace("Left mouse key pressed");
                 self.zoomSelectionFrom = event.clientX;
             }
         };
         self.mouseMove = function(viewModel, event) {
             if (event.which === 1) {
-                log.debug("Mouse is moved with left mouse key pressed");
+                log.trace("Mouse is moved with left mouse key pressed");
                 self.zoomSelectionTo = event.clientX;
             }
         };
@@ -605,10 +610,9 @@ $(function() {
             return true;
         });
         self.undoZoom = function() {
-            log.debug("Undoing zoom pressed, zoomHistory: " + JSON.stringify(self.zoomHistory()));
+            log.info("Undoing zoom", self.zoomHistory());
             var lastZoomHistory = self.zoomHistory.pop();
             if (lastZoomHistory !== undefined) {
-                log.debug("Undoing zoom");
                 self.updateFromDate(lastZoomHistory.fromDate);
                 self.updateToDate(lastZoomHistory.toDate);
                 self.timePeriod(lastZoomHistory.timePeriod);
@@ -616,7 +620,7 @@ $(function() {
             }
         };
         self.zoomOut = function() {
-            log.debug("Zooming out");
+            log.info("Zooming out " + getDeltaForTimePeriod(12).value + " " + getDeltaForTimePeriod(12).timeUnit);
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
@@ -624,18 +628,18 @@ $(function() {
             });
             var delta = getZoomOutDeltaForTimePeriod();
             if (self.toDate().isSame(self.price().data[self.price().data.length - 1][0])) {
-                self.updateFromDate(self.fromDate().subtract(delta.timeUnit, delta.value * 2));
+                self.updateFromDate(self.fromDate().subtract(delta.value * 2, delta.timeUnit));
             } else if (self.fromDate().isSame(self.price().data[0][0])) {
-                self.updateToDate(self.toDate().add(delta.timeUnit, delta.value * 2));
+                self.updateToDate(self.toDate().add(delta.value * 2, delta.timeUnit));
             } else {
-                self.updateFromDate(self.fromDate().subtract(delta.timeUnit, delta.value));
-                self.updateToDate(self.toDate().add(delta.timeUnit, delta.value));
+                self.updateFromDate(self.fromDate().subtract(delta.value, delta.timeUnit));
+                self.updateToDate(self.toDate().add(delta.value, delta.timeUnit));
             }
             self.timePeriod("custom");
             self.plot();
         };
         self.zoomIn = function() {
-            log.debug("Zooming in");
+            log.info("Zooming in " + getDeltaForTimePeriod(14).value + " " + getDeltaForTimePeriod(14).timeUnit);
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
@@ -643,47 +647,47 @@ $(function() {
             });
             var delta = getZoomInDeltaForTimePeriod();
             if (self.toDate().isSame(self.price().data[self.price().data.length - 1][0])) {
-                self.updateFromDate(self.fromDate().add(delta.timeUnit, delta.value * 2));
+                self.updateFromDate(self.fromDate().add(delta.value * 2, delta.timeUnit));
             } else if (self.fromDate().isSame(self.price().data[0][0])) {
-                self.updateToDate(self.toDate().subtract(delta.timeUnit, delta.value * 2));
+                self.updateToDate(self.toDate().subtract(delta.value * 2, delta.timeUnit));
             } else {
-                self.updateFromDate(self.fromDate().add(delta.timeUnit, delta.value));
-                self.updateToDate(self.toDate().subtract(delta.timeUnit, delta.value));
+                self.updateFromDate(self.fromDate().add(delta.value, delta.timeUnit));
+                self.updateToDate(self.toDate().subtract(delta.value, delta.timeUnit));
             }
             self.timePeriod("custom");
             self.plot();
         };
 
         self.panLeft = function() {
-            log.debug("Panning left");
+            log.info("Panning left");
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
                 timePeriod: self.timePeriod()
             });
             var delta = getPanDeltaForTimePeriod();
-            var bouncedDuration = self.updateFromDate(self.fromDate().clone().subtract(delta.timeUnit, delta.value));
+            var bouncedDuration = self.updateFromDate(self.fromDate().clone().subtract(delta.value, delta.timeUnit));
             if (bouncedDuration !== null) {
                 self.updateToDate(self.toDate().clone().add(bouncedDuration));
             } else {
-                self.updateToDate(self.toDate().clone().subtract(delta.timeUnit, delta.value));
+                self.updateToDate(self.toDate().clone().subtract(delta.value, delta.timeUnit));
             }
             self.timePeriod("custom");
             self.plot();
         };
         self.panRight = function() {
-            log.debug("Panning right");
+            log.info("Panning right");
             self.zoomHistory.push({
                 fromDate: self.fromDate().clone(),
                 toDate: self.toDate().clone(),
                 timePeriod: self.timePeriod()
             });
             var delta = getPanDeltaForTimePeriod();
-            var bouncedDuration = self.updateToDate(self.toDate().clone().add(delta.timeUnit, delta.value));
+            var bouncedDuration = self.updateToDate(self.toDate().clone().add(delta.value, delta.timeUnit));
             if (bouncedDuration !== null) {
                 self.updateFromDate(self.fromDate().clone().add(bouncedDuration));
             } else {
-                self.updateFromDate(self.fromDate().clone().add(delta.timeUnit, delta.value));
+                self.updateFromDate(self.fromDate().clone().add(delta.value, delta.timeUnit));
             }
             self.timePeriod("custom");
             self.plot();
@@ -694,41 +698,41 @@ $(function() {
                 return true;
             }
             var keyCode = (event.which ? event.which : event.keyCode);
-            log.debug("Handling keyboard shortcuts (keyCode = " + keyCode + ")");
+            log.trace("Handling keyboard shortcuts (keyCode = " + keyCode + ")");
             if (keyCode === 37) { // Left arrow
-                log.debug("Left arrow key pressed");
+                log.trace("Left arrow key pressed");
                 self.panLeft();
                 return false;
             } else if (keyCode === 39) { // Right arrow
-                log.debug("Right arrow key pressed");
+                log.trace("Right arrow key pressed");
                 self.panRight();
                 return false;
             } else if (keyCode === 40) { // Down arrow
-                log.debug("Down arrow key pressed");
+                log.trace("Down arrow key pressed");
                 self.zoomOut();
                 return false;
             } else if (keyCode === 38) { // Up arrow
-                log.debug("Up arrow key pressed");
+                log.trace("Up arrow key pressed");
                 self.zoomIn();
                 return false;
             } else if (keyCode === 189) { // Minus sign
-                log.debug("Minus sign key pressed");
+                log.trace("Minus sign key pressed");
                 self.zoomOut();
                 return false;
             } else if (keyCode === 187) { // Plus sign
-                log.debug("Plus sign key pressed");
+                log.trace("Plus sign key pressed");
                 self.zoomIn();
                 return false;
             } else if (keyCode === 27) { // Escape
-                log.debug("Escape key pressed");
+                log.trace("Escape key pressed");
                 self.changeTimePeriodToAll();
                 return false;
             } else if (keyCode === 8) { // Backspace
-                log.debug("Backspace key pressed");
+                log.trace("Backspace key pressed");
                 self.undoZoom();
                 return false;
             } else if (keyCode === 17) { // Ctrl
-                log.debug("Ctrl key pressed");
+                log.trace("Ctrl key pressed");
                 self.ctrlKeyDown = true;
                 self.hoverPopoverDate(self.hoverPopoverDate()); // Refresh hover popover date
                 return true;
@@ -866,51 +870,21 @@ $(function() {
             });
             $("#symbol").on("change", function(event) {
                 self.symbol(event.val);
-                self.downloadData(function(data) {
-                    self.downloadedData = data;
-                    self.processData();
-                    self.plot();
-                });
-            });
-
-            self.downloadData(function(data) {
-                self.downloadedData = data;
-                self.processData();
+                self.downloadAndProcessData();
                 self.plot();
             });
+
+            self.downloadAndProcessData();
+            self.plot();
         };
 
-        self.downloadData = function(callback) {
-            log.debug("Downloading data for symbol " + self.symbol());
-            var data = convertToFlotFormat(yahooFinance(self.symbol()).getData());
-            callback(data);
-        };
-
-        self.processData = function() {
-            log.debug("Processing data");
+        self.downloadAndProcessData = function() {
+            log.debug("Downloading and processing data");
             var start = moment().valueOf();
+
+            self.downloadedData = flotFinance(self.symbol()).getClosePrice(self.scale(), self.enableSplitDetection());            
             self.plotArgs.series = [];
-
             self.price().data = jQuery.extend(true, [], self.downloadedData);
-            if (self.enableSplitDetection()) {
-                log.debug("Adjusting splits");
-                adjustSplits(self.price().data);
-
-            }
-            switch (self.scale()) {
-                case "day":
-                    // Keeping original self.price().data
-                    break;
-                case "week":
-                    self.price().data = scaleToWeek(self.price().data);
-                    break;
-                case "month":
-                    self.price().data = scaleToMonth(self.price().data);
-                    break;
-                case "year":
-                    self.price().data = scaleToYear(self.price().data);
-                    break;
-            }
 
             // Init from and to date
             self.toDate(getLastPriceDate());
@@ -957,7 +931,7 @@ $(function() {
 
             var stop = moment().valueOf();
             var executionTime = stop - start;
-            log.debug("Processing data took " + executionTime + " milliseconds");
+            log.debug("Downloading and processing data took " + executionTime + " milliseconds");
         };
 
         self.plot = function() {
@@ -1209,17 +1183,17 @@ $(function() {
             if (self.timePeriod() === "all") {
                 return self.price().data[0][0].clone();
             } else if (self.timePeriod() === "10years") {
-                return self.toDate().clone().subtract("years", 10);
+                return self.toDate().clone().subtract(10, "years");
             } else if (self.timePeriod() === "3years") {
-                return self.toDate().clone().subtract("years", 3);
+                return self.toDate().clone().subtract(3, "years");
             } else if (self.timePeriod() === "year") {
-                return self.toDate().clone().subtract("years", 1);
+                return self.toDate().clone().subtract(1, "years");
             } else if (self.timePeriod() === "3months") {
-                return self.toDate().clone().subtract("months", 3);
+                return self.toDate().clone().subtract(3, "months");
             } else if (self.timePeriod() === "month") {
-                return self.toDate().clone().subtract("months", 1);
+                return self.toDate().clone().subtract(1, "months");
             } else if (self.timePeriod() === "week") {
-                return self.toDate().clone().subtract("weeks", 1);
+                return self.toDate().clone().subtract(1, "weeks");
             } else {
                 return self.fromDate().clone();
             }
@@ -1254,11 +1228,9 @@ $(function() {
             }
         }
         function getZoomInDeltaForTimePeriod() {
-            console.log("Zooming in " + getDeltaForTimePeriod(14).value + " " + getDeltaForTimePeriod(14).timeUnit);
             return getDeltaForTimePeriod(14);
         }
         function getZoomOutDeltaForTimePeriod() {
-            console.log("Zooming out " + getDeltaForTimePeriod(12).value + " " + getDeltaForTimePeriod(12).timeUnit);
             return getDeltaForTimePeriod(12);
         }
         function getPanDeltaForTimePeriod() {
