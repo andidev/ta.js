@@ -34,7 +34,6 @@ $(function() {
         self.flotFinanceSymbol = ko.computed(function() {
             return flotFinance(self.symbol());
         });
-        self.downloadedData;
         self.price = ko.observable({
             label: self.symbol(),
             data: [],
