@@ -276,7 +276,7 @@ $(function() {
                 self.plot();
             }
         };
-        self.changeScaleToDay = function() {
+        self.changeScaleToDays = function() {
             if (self.scale() !== "days") {
                 log.info("Changing scale to Days");
                 self.scale("days");
@@ -284,7 +284,7 @@ $(function() {
                 self.plot();
             }
         };
-        self.changeScaleToWeek = function() {
+        self.changeScaleToWeeks = function() {
             if (self.scale() !== "weeks") {
                 log.info("Changing scale to Weeks");
                 self.scale("weeks");
@@ -292,7 +292,7 @@ $(function() {
                 self.plot();
             }
         };
-        self.changeScaleToMonth = function() {
+        self.changeScaleToMonths = function() {
             if (self.scale() !== "months") {
                 log.info("Changing scale to Months");
                 self.scale("months");
@@ -300,7 +300,7 @@ $(function() {
                 self.plot();
             }
         };
-        self.changeScaleToYear = function() {
+        self.changeScaleToYears = function() {
             if (self.scale() !== "years") {
                 log.info("Changing scale to Years");
                 self.scale("years");

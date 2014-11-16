@@ -177,15 +177,15 @@
                 // Keep original day scale
                 return data;
             case "weeks":
-                return scaleToWeek(data);
+                return scaleToWeeks(data);
             case "months":
-                return scaleToMonth(data);
+                return scaleToMonths(data);
             case "years":
-                return scaleToYear(data);
+                return scaleToYears(data);
         }
     };
 
-    var scaleToWeek = function (data) {
+    var scaleToWeeks = function (data) {
         log.trace("Scaling data to week", data);
         var scaledData = [];
         var currentWeek = data[0][0].isoWeek();
@@ -203,7 +203,7 @@
         return scaledData;
     };
 
-    var scaleToMonth = function (data) {
+    var scaleToMonths = function (data) {
         log.trace("Scaling data to month", data);
         var scaledData = [];
         var currentMonth = data[0][0].month();
@@ -221,7 +221,7 @@
         return scaledData;
     };
 
-    var scaleToYear = function (data) {
+    var scaleToYears = function (data) {
         log.trace("Scaling data to year", data);
         var scaledData = [];
         var currentYear = data[0][0].year();
