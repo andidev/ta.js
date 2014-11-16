@@ -31,7 +31,9 @@ $(function() {
             });
             return symbolName;
         });
-        self.flotFinanceSymbol = flotFinance(self.symbol());
+        self.flotFinanceSymbol = ko.computed(function() {
+            return flotFinance(self.symbol());
+        });
         self.downloadedData;
         self.price = ko.observable({
             label: self.symbol(),
@@ -875,7 +877,7 @@ $(function() {
             var start = moment().valueOf();
 
             self.plotArgs.series = [];
-            self.price().data = self.flotFinanceSymbol.getClosePrice(self.scale(), self.enableSplitDetection());            
+            self.price().data = self.flotFinanceSymbol().getClosePrice(self.scale(), self.enableSplitDetection());
 
             // Init from and to date
             self.toDate(getLastPriceDate());
@@ -887,35 +889,35 @@ $(function() {
             self.plotArgs.series.push(self.price());
 
             // Calculate MA Fastest
-            self.maFastest().data = self.flotFinanceSymbol.getMaPrice(self.maFastestDatumPoints(), self.scale(), self.enableSplitDetection());
+            self.maFastest().data = self.flotFinanceSymbol().getMaPrice(self.maFastestDatumPoints(), self.scale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maFastest());
 
             // Calculate MA Fast
-            self.maFast().data = self.flotFinanceSymbol.getMaPrice(self.maFastDatumPoints(), self.scale(), self.enableSplitDetection());
+            self.maFast().data = self.flotFinanceSymbol().getMaPrice(self.maFastDatumPoints(), self.scale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maFast());
 
             // Calculate MA Slow
-            self.maSlow().data = self.flotFinanceSymbol.getMaPrice(self.maSlowDatumPoints(), self.scale(), self.enableSplitDetection());
+            self.maSlow().data = self.flotFinanceSymbol().getMaPrice(self.maSlowDatumPoints(), self.scale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maSlow());
 
             // Calculate MA Slower
-            self.maSlower().data = self.flotFinanceSymbol.getMaPrice(self.maSlowerDatumPoints(), self.scale(), self.enableSplitDetection());
+            self.maSlower().data = self.flotFinanceSymbol().getMaPrice(self.maSlowerDatumPoints(), self.scale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maSlower());
 
             // Calculate MA Slowest
-            self.maSlowest().data = self.flotFinanceSymbol.getMaPrice(self.maSlowestDatumPoints(), self.scale(), self.enableSplitDetection());
+            self.maSlowest().data = self.flotFinanceSymbol().getMaPrice(self.maSlowestDatumPoints(), self.scale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maSlowest());
 
             // Calculate MACD
-            self.macd().data = self.flotFinanceSymbol.getMacd(26, 12, 9, self.scale(), self.enableSplitDetection());
+            self.macd().data = self.flotFinanceSymbol().getMacd(26, 12, 9, self.scale(), self.enableSplitDetection());
             self.macdPlotArgs.series.push(self.macd());
 
             // Calculate MACD Signal
-            self.macdSignal().data = self.flotFinanceSymbol.getMacdSignal(26, 12, 9, self.scale(), self.enableSplitDetection());
+            self.macdSignal().data = self.flotFinanceSymbol().getMacdSignal(26, 12, 9, self.scale(), self.enableSplitDetection());
             self.macdPlotArgs.series.push(self.macdSignal());
 
             // Calculate MACD Histogram
-            self.macdHistogram().data = self.flotFinanceSymbol.getMacdHistogram(26, 12, 9, self.scale(), self.enableSplitDetection());
+            self.macdHistogram().data = self.flotFinanceSymbol().getMacdHistogram(26, 12, 9, self.scale(), self.enableSplitDetection());
             self.macdPlotArgs.series.push(self.macdHistogram());
 
             var stop = moment().valueOf();
