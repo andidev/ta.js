@@ -31,6 +31,7 @@ $(function() {
             });
             return symbolName;
         });
+        self.flotFinanceSymbol = flotFinance(self.symbol());
         self.downloadedData;
         self.price = ko.observable({
             label: self.symbol(),
@@ -269,7 +270,7 @@ $(function() {
             if (self.scale() !== "auto") {
                 log.info("Changing scale to Auto");
                 self.scale("auto");
-                self.downloadAndProcessData();
+                self.processData();
                 self.plot();
             }
         };
@@ -277,7 +278,7 @@ $(function() {
             if (self.scale() !== "days") {
                 log.info("Changing scale to Days");
                 self.scale("days");
-                self.downloadAndProcessData();
+                self.processData();
                 self.plot();
             }
         };
@@ -285,7 +286,7 @@ $(function() {
             if (self.scale() !== "weeks") {
                 log.info("Changing scale to Weeks");
                 self.scale("weeks");
-                self.downloadAndProcessData();
+                self.processData();
                 self.plot();
             }
         };
@@ -293,7 +294,7 @@ $(function() {
             if (self.scale() !== "months") {
                 log.info("Changing scale to Months");
                 self.scale("months");
-                self.downloadAndProcessData();
+                self.processData();
                 self.plot();
             }
         };
@@ -301,7 +302,7 @@ $(function() {
             if (self.scale() !== "years") {
                 log.info("Changing scale to Years");
                 self.scale("years");
-                self.downloadAndProcessData();
+                self.processData();
                 self.plot();
             }
         };
@@ -399,7 +400,7 @@ $(function() {
                 log.info("Disabling Split Detection");
                 self.enableSplitDetection(false);
             }
-            self.downloadAndProcessData();
+            self.processData();
             self.plot();
         };
         self.toggleMa5Ma14 = function() {
@@ -870,21 +871,20 @@ $(function() {
             });
             $("#symbol").on("change", function(event) {
                 self.symbol(event.val);
-                self.downloadAndProcessData();
+                self.processData();
                 self.plot();
             });
 
-            self.downloadAndProcessData();
+            self.processData();
             self.plot();
         };
 
-        self.downloadAndProcessData = function() {
-            log.debug("Downloading and processing data");
+        self.processData = function() {
+            log.debug("Processing data");
             var start = moment().valueOf();
 
-            self.downloadedData = flotFinance(self.symbol()).getClosePrice(self.scale(), self.enableSplitDetection());            
             self.plotArgs.series = [];
-            self.price().data = jQuery.extend(true, [], self.downloadedData);
+            self.price().data = self.flotFinanceSymbol.getClosePrice(self.scale(), self.enableSplitDetection());            
 
             // Init from and to date
             self.toDate(getLastPriceDate());
@@ -931,7 +931,7 @@ $(function() {
 
             var stop = moment().valueOf();
             var executionTime = stop - start;
-            log.debug("Downloading and processing data took " + executionTime + " milliseconds");
+            log.debug("Processing data data took " + executionTime + " milliseconds");
         };
 
         self.plot = function() {
