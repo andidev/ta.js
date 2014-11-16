@@ -879,9 +879,11 @@ $(function() {
             self.plotArgs.series = [];
             self.price().data = self.flotFinanceSymbol().getClosePrice(self.scale(), self.enableSplitDetection());
 
-            // Init from and to date
-            self.toDate(getLastPriceDate());
-            self.fromDate(getFromDateForTimePeriod());
+            if (self.toDate() === undefined) {
+                // Init from and to date
+                self.toDate(getLastPriceDate());
+                self.fromDate(getFromDateForTimePeriod());
+            }
 
 
             // Get Price
