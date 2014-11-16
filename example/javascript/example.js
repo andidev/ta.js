@@ -441,9 +441,7 @@ $(function() {
             if (self.maFastestDatumPoints() !== newDatumPoints) {
                 log.info("Updating MA Fastest to MA" + newDatumPoints);
                 self.maFastestDatumPoints(newDatumPoints);
-                var priceTA = TA(getPricesAsArray(self.price().data));
-                self.maFastest().data = convertToFlotFormat(priceTA.ma(newDatumPoints).asArray(), self.price().data);
-                self.plotArgs.series[1] = self.maFastest();
+                self.processData();
                 self.plot();
             }
         };
@@ -453,9 +451,7 @@ $(function() {
             if (self.maFastDatumPoints() !== newDatumPoints) {
                 log.info("Updating MA Fast to MA" + newDatumPoints);
                 self.maFastDatumPoints(newDatumPoints);
-                var priceTA = TA(getPricesAsArray(self.price().data));
-                self.maFast().data = convertToFlotFormat(priceTA.ma(newDatumPoints).asArray(), self.price().data);
-                self.plotArgs.series[2] = self.maFast();
+                self.processData();
                 self.plot();
             }
         };
@@ -465,9 +461,7 @@ $(function() {
             if (self.maSlowDatumPoints() !== newDatumPoints) {
                 log.info("Updating MA Slow to MA" + newDatumPoints);
                 self.maSlowDatumPoints(newDatumPoints);
-                var priceTA = TA(getPricesAsArray(self.price().data));
-                self.maSlow().data = convertToFlotFormat(priceTA.ma(newDatumPoints).asArray(), self.price().data);
-                self.plotArgs.series[3] = self.maSlow();
+                self.processData();
                 self.plot();
             }
         };
@@ -477,9 +471,7 @@ $(function() {
             if (self.maSlowerDatumPoints() !== newDatumPoints) {
                 log.info("Updating MA Slower to MA" + newDatumPoints);
                 self.maSlowerDatumPoints(newDatumPoints);
-                var priceTA = TA(getPricesAsArray(self.price().data));
-                self.maSlower().data = convertToFlotFormat(priceTA.ma(newDatumPoints).asArray(), self.price().data);
-                self.plotArgs.series[4] = self.maSlower();
+                self.processData();
                 self.plot();
             }
         };
@@ -489,9 +481,7 @@ $(function() {
             if (self.maSlowestDatumPoints() !== newDatumPoints) {
                 log.info("Updating MA Slowest to MA" + newDatumPoints);
                 self.maSlowestDatumPoints(newDatumPoints);
-                var priceTA = TA(getPricesAsArray(self.price().data));
-                self.maSlowest().data = convertToFlotFormat(priceTA.ma(newDatumPoints).asArray(), self.price().data);
-                self.plotArgs.series[5] = self.maSlowest();
+                self.processData();
                 self.plot();
             }
         };
@@ -554,7 +544,7 @@ $(function() {
             }
         };
         self.zoomSelection = function(viewModel, event, ranges) {
-            log.debug("Zooming selected");
+            log.trace("Zooming selection");
             var zoomDirection = (self.zoomSelectionTo - self.zoomSelectionFrom) < 0 ? "left" : "right";
             var fromIndex = self.findClosestDatapoint(ranges.xaxis.from);
             var toIndex = self.findClosestDatapoint(ranges.xaxis.to);
@@ -569,6 +559,7 @@ $(function() {
                     });
                     var from = self.price().data[fromIndex][0].clone();
                     var to = self.price().data[toIndex][0].clone();
+                    log.debug("Zooming selected from " + formatDate(from) + " to " + formatDate(to));
                     self.updateFromDate(from);
                     self.updateToDate(to);
                     self.timePeriod("custom");
@@ -895,38 +886,36 @@ $(function() {
             self.price().label = self.symbolName();
             self.plotArgs.series.push(self.price());
 
-            var priceTA = TA(getPricesAsArray(self.price().data));
             // Calculate MA Fastest
-            self.maFastest().data = convertToFlotFormat(priceTA.ma(self.maFastestDatumPoints()).asArray(), self.price().data);
+            self.maFastest().data = self.flotFinanceSymbol.getMaPrice(self.maFastestDatumPoints(), self.scale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maFastest());
 
             // Calculate MA Fast
-            self.maFast().data = convertToFlotFormat(priceTA.ma(self.maFastDatumPoints()).asArray(), self.price().data);
+            self.maFast().data = self.flotFinanceSymbol.getMaPrice(self.maFastDatumPoints(), self.scale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maFast());
 
             // Calculate MA Slow
-            self.maSlow().data = convertToFlotFormat(priceTA.ma(self.maSlowDatumPoints()).asArray(), self.price().data);
+            self.maSlow().data = self.flotFinanceSymbol.getMaPrice(self.maSlowDatumPoints(), self.scale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maSlow());
 
             // Calculate MA Slower
-            self.maSlower().data = convertToFlotFormat(priceTA.ma(self.maSlowerDatumPoints()).asArray(), self.price().data);
+            self.maSlower().data = self.flotFinanceSymbol.getMaPrice(self.maSlowerDatumPoints(), self.scale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maSlower());
 
             // Calculate MA Slowest
-            self.maSlowest().data = convertToFlotFormat(priceTA.ma(self.maSlowestDatumPoints()).asArray(), self.price().data);
+            self.maSlowest().data = self.flotFinanceSymbol.getMaPrice(self.maSlowestDatumPoints(), self.scale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maSlowest());
 
-            var macdTA = priceTA.macd(26, 12, 9);
             // Calculate MACD
-            self.macd().data = convertToFlotFormat(macdTA.macd.asArray(), self.price().data);
+            self.macd().data = self.flotFinanceSymbol.getMacd(26, 12, 9, self.scale(), self.enableSplitDetection());
             self.macdPlotArgs.series.push(self.macd());
 
             // Calculate MACD Signal
-            self.macdSignal().data = convertToFlotFormat(macdTA.signal.asArray(), self.price().data);
+            self.macdSignal().data = self.flotFinanceSymbol.getMacdSignal(26, 12, 9, self.scale(), self.enableSplitDetection());
             self.macdPlotArgs.series.push(self.macdSignal());
 
             // Calculate MACD Histogram
-            self.macdHistogram().data = convertToFlotFormat(macdTA.histogram.asArray(), self.price().data);
+            self.macdHistogram().data = self.flotFinanceSymbol.getMacdHistogram(26, 12, 9, self.scale(), self.enableSplitDetection());
             self.macdPlotArgs.series.push(self.macdHistogram());
 
             var stop = moment().valueOf();
@@ -1237,12 +1226,5 @@ $(function() {
             return getZoomOutDeltaForTimePeriod();
         }
     }
-
-    function getPricesAsArray(data) {
-        return $.map(data, function(value) {
-            return value[1];
-        });
-    }
-
 
 });

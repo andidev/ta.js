@@ -54,6 +54,75 @@
         return scaleTo(scale, close);
     }, this.symbol);
 
+    /**
+     * Get the (Simple) Mean Avarage
+     *
+     * @return     {Array} the Simple Mean Avarage
+     */
+    flotFinance.fn.getMaPrice = cached(function (n, scale, splitDetection) {
+        var data = this.getClosePrice(scale, splitDetection);
+        var priceTA = this.getPriceTA(scale, splitDetection);
+        data = convertToFlotFormat(priceTA.ma(n).asArray(), data);
+        return data;
+    }, this.symbol);
+
+    /**
+     * Get the MACD curve
+     *
+     * @return     {Array} the MACD curve
+     */
+    flotFinance.fn.getMacd = cached(function (nSlow, nFast, nSignal, scale, splitDetection) {
+        var data = this.getClosePrice(scale, splitDetection);
+        var macdTA = this.getMacdTA(nSlow, nFast, nSignal, scale, splitDetection);
+        data = convertToFlotFormat(macdTA.macd.asArray(), data);
+        return data;
+    }, this.symbol);
+
+    /**
+     * Get the MACD signal
+     *
+     * @return     {Array} the MACD signal
+     */
+    flotFinance.fn.getMacdSignal = cached(function (nSlow, nFast, nSignal, scale, splitDetection) {
+        var data = this.getClosePrice(scale, splitDetection);
+        var macdTA = this.getMacdTA(nSlow, nFast, nSignal, scale, splitDetection);
+        data = convertToFlotFormat(macdTA.signal.asArray(), data);
+        return data;
+    }, this.symbol);
+
+    /**
+     * Get the MACD histogram
+     *
+     * @return     {Array} the MACD curve
+     */
+    flotFinance.fn.getMacdHistogram = cached(function (nSlow, nFast, nSignal, scale, splitDetection) {
+        var data = this.getClosePrice(scale, splitDetection);
+        var macdTA = this.getMacdTA(nSlow, nFast, nSignal, scale, splitDetection);
+        data = convertToFlotFormat(macdTA.histogram.asArray(), data);
+        return data;
+    }, this.symbol);
+
+    /**
+     * Get the Price TA Object
+     *
+     * @return     {Array} the MACD curve
+     */
+    flotFinance.fn.getPriceTA = cached(function (scale, splitDetection) {
+        var data = this.getClosePrice(scale, splitDetection);
+        var priceTA = TA(getPricesAsArray(data));
+        return priceTA;
+    }, this.symbol);
+
+    /**
+     * Get the MACD TA Object
+     *
+     * @return     {Array} the MACD curve
+     */
+    flotFinance.fn.getMacdTA = cached(function (nSlow, nFast, nSignal, scale, splitDetection) {
+        var priceTA = this.getPriceTA(scale, splitDetection);
+        var macdTA = priceTA.macd(nSlow, nFast, nSignal);
+        return macdTA;
+    }, this.symbol);
 
     flotFinance.fn.isCloseEqualToAdjClose = function (a, b) {
         var close = this.getClosePrice();
@@ -75,7 +144,7 @@
         return function () {
             var key = this.symbol + JSON.stringify(Array.prototype.slice.call(arguments));
             if (key in cache) {
-                log.debug('Loading from cache ' + key, cache[key], cache);
+                log.trace('Loading from cache ' + key, cache[key], cache);
                 return cache[key];
             } else {
                 var data = f.apply(this, arguments);
@@ -187,6 +256,20 @@
             }
         }
         return data;
+    };
+
+    var convertToFlotFormat = function (arg1, arg2) {
+        // Array passed as arg1 and price in Flot format as arg2
+        log.trace("Converting array to Flot format");
+        return $.map(arg1, function (value, index) {
+            return [[arg2[index][0], value]];
+        });
+    };
+
+    var getPricesAsArray = function (data) {
+        return $.map(data, function (value) {
+            return value[1];
+        });
     };
 
 })();

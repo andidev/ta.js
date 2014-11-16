@@ -39,11 +39,3 @@ function addPaddingsToYaxisMinMax(yaxisMinMax, paddingFactor) {
         max: yaxisMinMax.max + padding
     };
 }
-
-function convertToFlotFormat(arg1, arg2) {
-    // Array passed as arg1 and price in Flot format as arg2
-    log.trace("Converting array to Flot format");
-    return $.map(arg1, function (value, index) {
-        return [[arg2[index][0], value]];
-    });
-}
