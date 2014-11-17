@@ -172,7 +172,7 @@
                                             <a href="#" class="clearfix" data-bind="click: changeScaleToYears">Years <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'years'}"></i></a>
                                         </li>
                                         <li>
-                                            <a href="#" class="clearfix" data-bind="click: changeScaleToAuto">Auto <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'auto'}"></i></a>
+                                            <a href="#" class="clearfix" data-bind="click: changeScaleToAuto">Auto <span class="" data-bind="visible: scale() === 'auto', text: ' - ' + _.str.capitalize(computeScale()) + ''"></span> <i class="fa pull-right" data-bind="css: {'fa-check': scale() === 'auto'}"></i></a>
                                         </li>
                                     </ul>
                                 </div>

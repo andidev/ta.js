@@ -318,6 +318,7 @@ $(function() {
             self.timePeriod("all");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
+            self.processData();
             self.plot();
         };
         self.changeTimePeriodTo10Years = function() {
@@ -330,6 +331,7 @@ $(function() {
             self.timePeriod("10years");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
+            self.processData();
             self.plot();
         };
         self.changeTimePeriodTo3Years = function() {
@@ -342,6 +344,7 @@ $(function() {
             self.timePeriod("3years");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
+            self.processData();
             self.plot();
         };
         self.changeTimePeriodToYear = function() {
@@ -354,6 +357,7 @@ $(function() {
             self.timePeriod("year");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
+            self.processData();
             self.plot();
         };
         self.changeTimePeriodTo3Months = function() {
@@ -366,6 +370,7 @@ $(function() {
             self.timePeriod("3months");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
+            self.processData();
             self.plot();
         };
         self.changeTimePeriodToMonth = function() {
@@ -378,6 +383,7 @@ $(function() {
             self.timePeriod("month");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
+            self.processData();
             self.plot();
         };
         self.changeTimePeriodToWeek = function() {
@@ -390,6 +396,7 @@ $(function() {
             self.timePeriod("week");
             self.toDate(getLastPriceDate());
             self.fromDate(getFromDateForTimePeriod());
+            self.processData();
             self.plot();
         };
 
@@ -516,6 +523,7 @@ $(function() {
                 log.info("Changing From Date to " + formatDate(moment(event.date)));
                 self.updateFromDate(moment(event.date));
                 self.timePeriod("custom");
+                self.processData();
                 self.plot();
             }
         };
@@ -525,6 +533,7 @@ $(function() {
                 log.info("Changing To Date to " + formatDate(moment(event.date)));
                 self.updateToDate(moment(event.date));
                 self.timePeriod("custom");
+                self.processData();
                 self.plot();
             }
         };
@@ -564,6 +573,7 @@ $(function() {
                     self.updateFromDate(from);
                     self.updateToDate(to);
                     self.timePeriod("custom");
+                    self.processData();
                     self.plot();
                 }
             }
@@ -609,6 +619,7 @@ $(function() {
                 self.updateFromDate(lastZoomHistory.fromDate);
                 self.updateToDate(lastZoomHistory.toDate);
                 self.timePeriod(lastZoomHistory.timePeriod);
+                self.processData();
                 self.plot();
             }
         };
@@ -629,6 +640,7 @@ $(function() {
                 self.updateToDate(self.toDate().add(delta.value, delta.timeUnit));
             }
             self.timePeriod("custom");
+            self.processData();
             self.plot();
         };
         self.zoomIn = function() {
@@ -648,6 +660,7 @@ $(function() {
                 self.updateToDate(self.toDate().subtract(delta.value, delta.timeUnit));
             }
             self.timePeriod("custom");
+            self.processData();
             self.plot();
         };
 
@@ -666,6 +679,7 @@ $(function() {
                 self.updateToDate(self.toDate().clone().subtract(delta.value, delta.timeUnit));
             }
             self.timePeriod("custom");
+            self.processData();
             self.plot();
         };
         self.panRight = function() {
@@ -683,6 +697,7 @@ $(function() {
                 self.updateFromDate(self.fromDate().clone().add(delta.value, delta.timeUnit));
             }
             self.timePeriod("custom");
+            self.processData();
             self.plot();
         };
         self.ctrlKeyDown = false;
@@ -876,49 +891,49 @@ $(function() {
             var start = moment().valueOf();
 
             self.plotArgs.series = [];
-            self.price().data = self.flotFinanceSymbol().getClosePrice(self.scale(), self.enableSplitDetection());
+            self.price().data = self.flotFinanceSymbol().getClosePrice(self.computeScale(), self.enableSplitDetection());
 
             if (self.toDate() === undefined) {
-                // Init from and to date
                 self.toDate(getLastPriceDate());
+            }
+            if (self.fromDate() === undefined) {
                 self.fromDate(getFromDateForTimePeriod());
             }
-
 
             // Get Price
             self.price().label = self.symbolName();
             self.plotArgs.series.push(self.price());
 
             // Calculate MA Fastest
-            self.maFastest().data = self.flotFinanceSymbol().getMaPrice(self.maFastestDatumPoints(), self.scale(), self.enableSplitDetection());
+            self.maFastest().data = self.flotFinanceSymbol().getMaPrice(self.maFastestDatumPoints(), self.computeScale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maFastest());
 
             // Calculate MA Fast
-            self.maFast().data = self.flotFinanceSymbol().getMaPrice(self.maFastDatumPoints(), self.scale(), self.enableSplitDetection());
+            self.maFast().data = self.flotFinanceSymbol().getMaPrice(self.maFastDatumPoints(), self.computeScale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maFast());
 
             // Calculate MA Slow
-            self.maSlow().data = self.flotFinanceSymbol().getMaPrice(self.maSlowDatumPoints(), self.scale(), self.enableSplitDetection());
+            self.maSlow().data = self.flotFinanceSymbol().getMaPrice(self.maSlowDatumPoints(), self.computeScale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maSlow());
 
             // Calculate MA Slower
-            self.maSlower().data = self.flotFinanceSymbol().getMaPrice(self.maSlowerDatumPoints(), self.scale(), self.enableSplitDetection());
+            self.maSlower().data = self.flotFinanceSymbol().getMaPrice(self.maSlowerDatumPoints(), self.computeScale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maSlower());
 
             // Calculate MA Slowest
-            self.maSlowest().data = self.flotFinanceSymbol().getMaPrice(self.maSlowestDatumPoints(), self.scale(), self.enableSplitDetection());
+            self.maSlowest().data = self.flotFinanceSymbol().getMaPrice(self.maSlowestDatumPoints(), self.computeScale(), self.enableSplitDetection());
             self.plotArgs.series.push(self.maSlowest());
 
             // Calculate MACD
-            self.macd().data = self.flotFinanceSymbol().getMacd(26, 12, 9, self.scale(), self.enableSplitDetection());
+            self.macd().data = self.flotFinanceSymbol().getMacd(26, 12, 9, self.computeScale(), self.enableSplitDetection());
             self.macdPlotArgs.series.push(self.macd());
 
             // Calculate MACD Signal
-            self.macdSignal().data = self.flotFinanceSymbol().getMacdSignal(26, 12, 9, self.scale(), self.enableSplitDetection());
+            self.macdSignal().data = self.flotFinanceSymbol().getMacdSignal(26, 12, 9, self.computeScale(), self.enableSplitDetection());
             self.macdPlotArgs.series.push(self.macdSignal());
 
             // Calculate MACD Histogram
-            self.macdHistogram().data = self.flotFinanceSymbol().getMacdHistogram(26, 12, 9, self.scale(), self.enableSplitDetection());
+            self.macdHistogram().data = self.flotFinanceSymbol().getMacdHistogram(26, 12, 9, self.computeScale(), self.enableSplitDetection());
             self.macdPlotArgs.series.push(self.macdHistogram());
 
             var stop = moment().valueOf();
@@ -1164,6 +1179,37 @@ $(function() {
                 lastMacd = self.macdHistogram().data[index][1];
             });
             self.profit(profit);
+        };
+        self.computeScale = function () {
+            if (self.scale() === "auto") {
+                if (self.timePeriod() === "all") {
+                    return "years";
+                } else if (self.timePeriod() === "10years") {
+                    return "years";
+                } else if (self.timePeriod() === "3years") {
+                    return "months";
+                } else if (self.timePeriod() === "year") {
+                    return "weeks";
+                } else if (self.timePeriod() === "3months") {
+                    return "days";
+                } else if (self.timePeriod() === "month") {
+                    return "days";
+                } else if (self.timePeriod() === "week") {
+                    return "days";
+                } else {
+                    if (self.toDate().diff(self.fromDate(), "years", true) >= 10) {
+                        return "years";
+                    } else if (self.toDate().diff(self.fromDate(), "years", true) >= 3) {
+                        return "months";
+                    } else if (self.toDate().diff(self.fromDate(), "years", true) >= 1) {
+                        return "weeks";
+                    } else {
+                        return "days";
+                    }
+                }
+            } else {
+                return self.scale();
+            }
         };
 
         // Initialize
