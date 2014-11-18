@@ -178,7 +178,7 @@ $(function() {
                     reserveSpace: true,
                     labelWidth: 30,
                     color: "rgba(56, 174, 17, 0.5)",
-                    tickColor: "rgba(56, 174, 17, 0.5)",
+                    tickColor: "rgba(56, 174, 17, 0.5)"
                 }
             ],
             selection: {
@@ -1159,7 +1159,7 @@ $(function() {
                 if (value[0].valueOf() < self.plotArgs.options.xaxis.min.valueOf() || value[0].valueOf() > self.plotArgs.options.xaxis.max.valueOf()) {
                     return true;
                 }
-                if (index == 0 || self.macdHistogram().data[index][1] === null) {
+                if (index === 0 || self.macdHistogram().data[index][1] === null) {
                     return true;
                 }
                 if (lastMacd === undefined) {
@@ -1170,14 +1170,14 @@ $(function() {
                 macd = self.macdHistogram().data[index][1];
                 if (lastMacd < 0 && macd > 0) {
                     log.trace("positive trend detected");
-                    if (money != 0) {
+                    if (money !== 0) {
                         stocks = money / value[1];
                         money = 0;
                         log.trace("bougth for price " + value[1] + " on " + value[0].format());
                     }
                 } else if (lastMacd > 0 && macd < 0) {
                     log.trace("negative trend detected");
-                    if (stocks != 0) {
+                    if (stocks !== 0) {
                         money = stocks * value[1];
                         profit = money / 1000 - 1;
                         stocks = 0;

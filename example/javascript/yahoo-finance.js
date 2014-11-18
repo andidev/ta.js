@@ -79,8 +79,6 @@
 
     /**
      * Get the cached symbol data in localStorage
-     *
-     * @param      {Object}   data
      */
     yahooFinance.fn.getDataCache = function () {
         var dataCache = localStorage.getItem(dataCacheKeyNameSpace + this.symbol + ".data");

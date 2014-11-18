@@ -246,7 +246,7 @@
         var adjustFactor = 1;
         for (i = data.length - 2; i >= 0; i--) {
             if (Math.round(data[i][1] / previousPrice) >= 2) {
-                log.debug("Split found and adjusted between " + data[i][0] + "(" + data[i][1] + ") to " + previousDate + " (" + previousPrice + ")")
+                log.debug("Split found and adjusted between " + data[i][0] + "(" + data[i][1] + ") to " + previousDate + " (" + previousPrice + ")");
                 adjustFactor = adjustFactor / Math.round(data[i][1] / previousPrice);
             }
             previousPrice = data[i][1];
