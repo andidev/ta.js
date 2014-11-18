@@ -138,6 +138,7 @@ $(function() {
         });
         self.enableSplitDetection = ko.observable(defaultBooleanValue(false, url.param("enableSplitDetection")));
         self.scale = ko.observable(defaultValue("days", url.param("scale")));
+        self.scaleTimePeriodAll = ko.observable("days");
         self.timePeriod = ko.observable(defaultValue("3years", url.param("timePeriod")));
         self.zoomHistory = ko.observableArray([]);
         self.toDate = ko.observable();
@@ -878,6 +879,7 @@ $(function() {
             });
             $("#symbol").on("change", function(event) {
                 self.symbol(event.val);
+                self.scaleTimePeriodAll("days");
                 self.processData();
                 self.plot();
             });
@@ -892,6 +894,12 @@ $(function() {
 
             self.plotArgs.series = [];
             self.price().data = self.flotFinanceSymbol().getClosePrice(self.computeScale(), self.enableSplitDetection());
+
+            if (self.scale() === "auto" && self.timePeriod() === "all") {
+                // Set time period all and reload data
+                self.scaleTimePeriodAll(self.computeScaleForZoom(getFirstPriceDate(), getLastPriceDate()));
+                self.price().data = (self.flotFinanceSymbol().getClosePrice(self.computeScale(), self.enableSplitDetection()));
+            }
 
             if (self.toDate() === undefined) {
                 self.toDate(getLastPriceDate());
@@ -1183,9 +1191,9 @@ $(function() {
         self.computeScale = function () {
             if (self.scale() === "auto") {
                 if (self.timePeriod() === "all") {
-                    return "years";
+                    return self.scaleTimePeriodAll();
                 } else if (self.timePeriod() === "10years") {
-                    return "years";
+                    return "months";
                 } else if (self.timePeriod() === "3years") {
                     return "months";
                 } else if (self.timePeriod() === "year") {
@@ -1197,23 +1205,30 @@ $(function() {
                 } else if (self.timePeriod() === "week") {
                     return "days";
                 } else {
-                    if (self.toDate().diff(self.fromDate(), "years", true) >= 10) {
-                        return "years";
-                    } else if (self.toDate().diff(self.fromDate(), "years", true) >= 3) {
-                        return "months";
-                    } else if (self.toDate().diff(self.fromDate(), "years", true) >= 1) {
-                        return "weeks";
-                    } else {
-                        return "days";
-                    }
+                    return self.computeScaleForZoom(self.fromDate(), self.toDate());
                 }
             } else {
                 return self.scale();
             }
         };
 
+        self.computeScaleForZoom = function (fromDate, toDate) {
+            if (toDate.diff(fromDate, "years", true) >= 50) {
+                return "years";
+            } else if (toDate.diff(fromDate, "years", true) >= 3) {
+                return "months";
+            } else if (toDate.diff(fromDate, "years", true) >= 1) {
+                return "weeks";
+            } else {
+                return "days";
+            }
+        };
+
         // Initialize
         self.init();
+        function getFirstPriceDate() {
+            return self.price().data[0][0].clone();
+        }
         function getLastPriceDate() {
             return self.price().data[self.price().data.length - 1][0].clone();
         }
