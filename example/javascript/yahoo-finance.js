@@ -172,7 +172,7 @@
     var dataCacheKeyNameSpace = "yahooFinance.";
 
     var mostRecentWorkingDay = function () {
-        var currentDate = moment(moment().format("YYYY-MM-DD"));
+        var currentDate = moment().startOf("day");
         if (currentDate.isoWeekday() === 7) {
             currentDate.subtract(2, 'days');
         } else if (currentDate.isoWeekday() === 6) {
