@@ -15,7 +15,7 @@
             // Invalid argument value
             throw "First argument must be a String containing a yahoo symbol, search for available symbols at http://finance.yahoo.com/lookup";
         }
-        
+
         return this;
     };
 
@@ -46,7 +46,7 @@
                 log.trace("Saving data to cache", downloadedData);
                 this.setDataCache(downloadedData);
                 log.trace("Data saved to cache", dataCacheKeyNameSpace + this.symbol + ".data", this.getDataCache());
-                return this.getDataCache();                
+                return this.getDataCache();
             } else if (this.isDataCacheOutOfDate()) {
                 if (this.isDataCacheCheckThrotteled()) {
                     log.debug("Dowloading data not needed (throtteled), using data found in cache");
@@ -65,14 +65,22 @@
                     this.appendDataCache(downloadedData);
                     log.trace("Data saved to cache", dataCacheKeyNameSpace + this.symbol + ".data", this.getDataCache());
                 }
-                return this.getDataCache();                
+                return this.getDataCache();
             } else {
                 log.debug("Dowloading data not needed, using data found in cache");
-                return this.getDataCache();                
+                return this.getDataCache();
             }
         } catch (e) {
-            alert("Something went wrong. Clearing symbol data cache for symbol = " + this.symbol + " for safety");
-            this.clearDataCache();
+            if (e.name === 'QuotaExceededError') {
+                log.error("Failed to save data to since maximum storage capacity was exceeded!");
+                log.error("Clearing data cache for symbol = " + this.symbol);
+                this.clearSymbolDataCache();
+            } else {
+                log.error("Something went wrong. Clearing data cache for safety");
+                alert("Something went wrong. Clearing data cache for safety");
+                log.error("Error = ", e);
+                this.clearDataCache();
+            }
             throw e;
         }
     };
@@ -100,7 +108,7 @@
 
     /**
      * Append data to the cached symbol data in localStorage
-     * 
+     *
      * @param      {Object}   data to append
      */
     yahooFinance.fn.appendDataCache = function (data) {
@@ -109,11 +117,21 @@
     };
 
     /**
-     * Clear the currently cached symbol data from localStorage
+     * Clear the currently cached data from localStorage
      * @return     {yahooFinance} returns the yahooFinance object
      */
     yahooFinance.fn.clearDataCache = function () {
         localStorage.clear();
+        return this;
+    };
+
+    /**
+     * Clear the currently cached symbol data from localStorage
+     * @return     {yahooFinance} returns the yahooFinance object
+     */
+    yahooFinance.fn.clearSymbolDataCache = function () {
+        localStorage.removeItem(dataCacheKeyNameSpace + this.symbol + ".data");
+        localStorage.removeItem(dataCacheKeyNameSpace + this.symbol + ".lastDataCacheCheckDate");
         return this;
     };
 
