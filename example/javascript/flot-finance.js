@@ -34,7 +34,7 @@
      * @return     {Array} the close price
      */
     flotFinance.fn.getClosePrice = cached(function (scale, splitDetection) {
-        var close = convertYahooFinanceToFlotFormat(this.yahooFinanceData, "close");
+        var close = this.convertYahooFinanceToFlotFormat("close");
         if (splitDetection) {
             close = adjustSplits(close);
         }
@@ -47,7 +47,7 @@
      * @return     {Array} the adjusted close price
      */
     flotFinance.fn.getAdjClosePrice = cached(function (scale, splitDetection) {
-        var close = convertYahooFinanceToFlotFormat(this.yahooFinanceData, "adjclose");
+        var close = this.convertYahooFinanceToFlotFormat("adjclose");
         if (splitDetection) {
             close = adjustSplits(close);
         }
@@ -103,6 +103,21 @@
     }, this.symbol);
 
     /**
+     * Convert Yahoo Finance format to Flot format
+     *
+     * @param {type} column to use (available columns open, high, low, close, volume, adjclose)
+     *
+     * @returns {Array}
+     */
+    flotFinance.fn.convertYahooFinanceToFlotFormat = cached(function (column) {
+        log.trace("Converting Yahoo Finance to Flot format");
+        var returnvalue = $.map(this.yahooFinanceData, function (value, index) {
+            return [[moment(value.date), parseFloat(value[column])]];
+        }).reverse();
+        return returnvalue;
+    }, this.symbol);
+
+    /**
      * Get the Price TA Object
      *
      * @return     {Array} the MACD curve
@@ -154,21 +169,6 @@
             }
         };
     }
-
-    /**
-     * Convert Yahoo Finance format to Flot format
-     *
-     * @param {type} data received from yahooFinance(symbol).getData() call
-     * @param {type} column to use (available columns open, high, low, close, volume, adjclose)
-     *
-     * @returns {Array}
-     */
-    var convertYahooFinanceToFlotFormat = function (data, column) {
-        log.trace("Converting Yahoo Finance to Flot format");
-        return $.map(data, function (value, index) {
-            return [[moment(value.date), parseFloat(value[column])]];
-        }).reverse();
-    };
 
     var scaleTo = function (scale, data) {
         switch (scale) {
