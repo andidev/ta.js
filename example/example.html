@@ -55,6 +55,11 @@
 
         <script type="text/javascript">
             $(function() {
+                console.time("loadingtime");
+                viewModel = new ViewModel();
+                ko.applyBindings(viewModel);
+                viewModel.init();
+
                 $('.slider').bootstrapSlider({
                     handle: 'square',
                     tooltip: 'hide'
@@ -79,6 +84,7 @@
                     $(this).hasClass('dropdown-menu-keep-open') && e.stopPropagation(); // This replace if conditional.
                 });
 
+                console.timeEnd("loadingtime");
             });
         </script>
 
