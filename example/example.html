@@ -187,6 +187,10 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-keep-open" role="menu" style="width:200px;">
                                         <li>
+                                            <a href="#" class="clearfix" data-bind="visible: hasVolume, click: toggleVolume">Volume <i class="fa pull-right" data-bind="css: {'fa-check': showVolume()}"></i></a>
+                                        </li>
+                                        <li role="presentation" class="divider"></li>
+                                        <li>
                                             <a href="#" class="clearfix" data-bind="click: toggleMa5Ma14"><span data-bind="text: 'MA' + maFastestDatumPoints() + '/' + maFastDatumPoints()">MA5/14</span> <i class="fa pull-right" data-bind="css: {'fa-check': showMa5Ma14(), 'fa-check-w': !showMa5Ma14()}"></i></a>
                                         </li>
                                         <li style="padding-left: 25px" data-bind="event: {slide: slideMaFastest}, visible: showMa5Ma14">
@@ -227,7 +231,8 @@
                         </div>
                     </div>
                     <div id="ta-plots" class="col-md-12">
-                        <div id="plot" data-bind="event: { mousedown: mouseDown, mousemove: mouseMove, plotselected: zoomSelection, plotselecting: syncSelectionInMacdPlot, plothover: showPriceInfo, mouseout: hidePriceInfo, mousewheel: scrollPanZoom}"></div>
+                        <div id="plot" data-bind="event: { mousedown: mouseDown, mousemove: mouseMove, plotselected: zoomSelection, plotselecting: syncSelectionInPlot, plothover: showPriceInfo, mouseout: hidePriceInfo, mousewheel: scrollPanZoom}"></div>
+                        <div id="volume-plot" data-bind="event: { mousedown: mouseDown, mousemove: mouseMove, plotselected: zoomSelection, plotselecting: syncSelectionInPlot, plothover: showPriceInfo, mouseout: hidePriceInfo}"></div>
                         <div id="macd-plot" data-bind="event: { mousedown: mouseDown, mousemove: mouseMove, plotselected: zoomSelection, plotselecting: syncSelectionInPlot, plothover: showPriceInfo, mouseout: hidePriceInfo}"></div>
                         <div id="hover-popover" class="popover right"><div class="arrow"></div><div class="popover-content"><span data-bind="css: hoverPopoverPercentColorClass"><i class="fa" data-bind="css: hoverPopoverPercentArrowClass"></i> <strong data-bind="html: hoverPopoverFormattedPercent()"></strong></span> <strong class="text-info" data-bind="text: hoverPopoverFormattedPrice"></strong> <strong class="text-muted" data-bind="text: hoverPopoverFormattedDate"></strong></div></div>
                         <!--<div id="hover-popover" class="popover right"><div class="arrow" style="top: 35%;"></div><div class="popover-content"><span data-bind="css: hoverPopoverPercentColorClass"><i class="fa" data-bind="css: hoverPopoverPercentArrowClass"></i> <strong data-bind="html: hoverPopoverFormattedPercent()"></strong></span> <strong class="text-info" data-bind="text: hoverPopoverFormattedPrice"></strong></div><h3 style="height: 20px; padding-top: 1px; margin-bottom: 0px; padding-bottom: 0px; border-top: 1px solid #ebebeb; border-bottom: 0px; border-radius: 0 0 5px 5px;" class="popover-title text-muted text-center"><strong class="text-muted" data-bind="text: hoverPopoverFormattedDate"></strong></h3></div>-->
@@ -293,7 +298,6 @@
                     <li>make macd parameters adjustable</li>
                     <li>add RSI</li>
                     <li>add EMA toggle</li>
-                    <li>add Volume</li>
                     <li>Handle local storage exceeded error (QuotaExceededError) correctly by removing oldest data (by refactororing lastDataCacheCheckDate to lastDataCheckDate)</li>
                 </ul>
             </div>

@@ -132,6 +132,22 @@ function ViewModel() {
         }
 
     });
+    self.hasVolume = ko.computed(function() {
+        if (self.flotFinanceSymbol()) {
+            return self.flotFinanceSymbol().hasVolume();
+        }
+    });
+    self.showVolume = ko.observable(defaultBooleanValue(true, url.param("showVolume")));
+    self.volume = ko.observable({
+        label: "Volume",
+        data: [],
+        color: "grey",
+        shadowSize: 1,
+        bars: {
+            show: true,
+            align: "center"
+        }
+    });
     self.enableSplitDetection = ko.observable(defaultBooleanValue(false, url.param("enableSplitDetection")));
     self.scale = ko.observable(defaultValue("days", url.param("scale")));
     self.scaleTimePeriodAll = ko.observable("days");
@@ -216,8 +232,14 @@ function ViewModel() {
                     }]
             }}, self.commonPlotOptions)
     };
+    self.volumePlotArgs = {
+        placeholder: $("#volume-plot"),
+        series: [],
+        options: jQuery.extend(true, {}, self.commonPlotOptions)
+    };
     self.$plot;
     self.$macdPlot;
+    self.$volumePlot;
 
     self.percent = ko.observable(0);
     self.formattedPercent = ko.computed(function() {
@@ -397,6 +419,16 @@ function ViewModel() {
         self.plot();
     };
 
+    self.toggleVolume = function() {
+        if (self.showVolume() === true) {
+            log.info("Hiding Volume");
+            self.showVolume(false);
+        } else {
+            log.info("Showing Volume");
+            self.showVolume(true);
+        }
+        self.plot();
+    };
     self.toggleSplitDetection = function() {
         if (self.enableSplitDetection() === false) {
             log.info("Enabling Split Detection");
@@ -579,16 +611,26 @@ function ViewModel() {
             if (self.showMacd()) {
                 self.$macdPlot.clearSelection();
             }
+            if (self.showVolume() && self.hasVolume()) {
+                self.$volumePlot.clearSelection();
+            }
         }
     };
     self.syncSelectionInPlot = function(viewModel, event, ranges) {
         if (ranges !== null) {
-            self.$plot.setSelection(ranges, true);
-        }
-    };
-    self.syncSelectionInMacdPlot = function(viewModel, event, ranges) {
-        if (self.showMacd() && ranges !== null) {
-            self.$macdPlot.setSelection(ranges, true);
+            if (event.currentTarget.id !== "plot") {
+                self.$plot.setSelection(ranges, true);
+            }
+            if (event.currentTarget.id !== "volume-plot") {
+                if (self.showVolume() && self.hasVolume()) {
+                    self.$volumePlot.setSelection(ranges, true);
+                }
+            }
+            if (event.currentTarget.id !== "macd-plot") {
+                if (self.showMacd()) {
+                    self.$macdPlot.setSelection(ranges, true);
+                }
+            }
         }
     };
 
@@ -808,6 +850,12 @@ function ViewModel() {
                     x: date,
                     y: price
                 });
+                if (self.showVolume() && self.hasVolume() && self.$volumePlot !== undefined) {
+                    self.$volumePlot.lockCrosshair({
+                        x: date,
+                        y: price
+                    });
+                }
                 if (self.showMacd() && self.$macdPlot !== undefined) {
                     self.$macdPlot.lockCrosshair({
                         x: date,
@@ -837,6 +885,9 @@ function ViewModel() {
     self.hidePriceInfo = function() {
         if (self.$plot !== undefined) {
             self.$plot.clearCrosshair();
+            if (self.showVolume() && self.hasVolume() && self.$volumePlot !== undefined) {
+                self.$volumePlot.clearCrosshair();
+            }
             if (self.showMacd() && self.$macdPlot !== undefined) {
                 self.$macdPlot.clearCrosshair();
             }
@@ -909,6 +960,12 @@ function ViewModel() {
         self.price().label = self.symbolName();
         self.plotArgs.series.push(self.price());
 
+        // Get Volume
+        if (self.flotFinanceSymbol().hasVolume()) {
+            self.volume().data = self.flotFinanceSymbol().getVolume(self.computeScale(), self.enableSplitDetection());
+            self.volumePlotArgs.series.push(self.volume());
+        }
+
         // Calculate MA Fastest
         self.maFastest().data = self.flotFinanceSymbol().getMaPrice(self.maFastestDatumPoints(), self.computeScale(), self.enableSplitDetection());
         self.plotArgs.series.push(self.maFastest());
@@ -951,6 +1008,7 @@ function ViewModel() {
         var start = moment().valueOf();
         self.plotMain();
         self.plotMacd();
+        self.plotVolume();
         var stop = moment().valueOf();
         var executionTime = stop - start;
         log.debug("Plotting took " + executionTime + " milliseconds");
@@ -991,7 +1049,7 @@ function ViewModel() {
         } else {
             self.plotArgs.options.xaxis.tickColor = "transparent";
         }
-        if (self.showMacd()) {
+        if (self.showMacd() || (self.showVolume() && self.hasVolume())) {
             self.plotArgs.options.xaxis.font = {color: "transparent"};
         } else {
             self.plotArgs.options.xaxis.font = null;
@@ -1018,6 +1076,43 @@ function ViewModel() {
         } else {
             $('#macd-plot').slideUp('fast', function() {
                 $('#macd-plot').html("");
+            });
+        }
+    };
+
+    self.plotVolume = function() {
+        log.info("Plotting Volume");
+        self.updateVolumePlotAxisMinAndMax();
+        if (self.showMacd()) {
+            self.volumePlotArgs.options.xaxis.font = {color: "transparent"};
+        } else {
+            self.volumePlotArgs.options.xaxis.font = null;
+        }
+        if (self.showVolume() && self.hasVolume()) {
+            if (self.computeScale() === "days") {
+                self.volume().bars.barWidth = 72000000; // 86400000 == 24h // a day in milliseconds
+            } else if (self.computeScale() === "weeks") {
+                self.volume().bars.barWidth = 518400000; // 604800000 == 7 days // a week in milliseconds
+            } else if (self.computeScale() === "months") {
+                self.volume().bars.barWidth = 2246400000; // 2419200000 == 28 days // a month in milliseconds
+            } else if (self.computeScale() === "years") {
+                self.volume().bars.barWidth = 31017600000; // 31536000000 == 356 days // a year in milliseconds
+            }
+
+            if (self.settings.showXaxisTicksInGrid) {
+                self.volumePlotArgs.options.xaxis.tickColor = null;
+            } else {
+                self.volumePlotArgs.options.xaxis.tickColor = "transparent";
+            }
+
+            self.volumePlotArgs.series = [self.volume()];
+            $("#volume-plot").css("margin-top", "-26px");
+            $("#volume-plot").slideDown('fast', function() {
+                self.$volumePlot = $.plot(this, self.volumePlotArgs.series, self.volumePlotArgs.options);
+            });
+        } else {
+            $('#volume-plot').slideUp('fast', function() {
+                $('#volume-plot').html("");
             });
         }
     };
@@ -1064,6 +1159,21 @@ function ViewModel() {
         // Update yaxis min/max for right yaxis
         self.macdPlotArgs.options.yaxes[1].min = yaxisRightMinMax.min;
         self.macdPlotArgs.options.yaxes[1].max = yaxisRightMinMax.max;
+    };
+
+    self.updateVolumePlotAxisMinAndMax = function() {
+        log.trace("updateVolumePlotAxisMinAndMax()");
+        // Update xaxis min/max
+        self.volumePlotArgs.options.xaxis.min = self.fromDate();
+        self.volumePlotArgs.options.xaxis.max = self.toDate();
+
+        // Find yaxis min/max for left yaxis
+        var yaxisLeftMinMax = findYaxisMinMax(self.volume(), self.fromDate(), self.toDate());
+        yaxisLeftMinMax = addPaddingsToYaxisMinMax(yaxisLeftMinMax, self.settings.paddingFactor);
+
+        // Update yaxis min/max for left yaxis
+        self.volumePlotArgs.options.yaxes[0].min = 0;
+        self.volumePlotArgs.options.yaxes[0].max = yaxisLeftMinMax.max;
     };
 
     self.findClosestDatapoint = function(date) {

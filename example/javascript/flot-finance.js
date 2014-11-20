@@ -55,6 +55,34 @@
     }, this.symbol);
 
     /**
+     * Get the volume
+     *
+     * @return     {Array} the volume
+     */
+    flotFinance.fn.getVolume = cached(function (scale, splitDetection) {
+        var volume = this.convertYahooFinanceToFlotFormat("volume");
+        if (splitDetection) {
+            volume = adjustSplits(volume);
+        }
+        return scaleTo(scale, volume, true);
+    }, this.symbol);
+
+    /**
+     * Check if volume data exists
+     *
+     * @return     {boolean} true if volume data exists
+     */
+    flotFinance.fn.hasVolume = cached(function () {
+        var firstVolume = this.yahooFinanceData[0].volume;
+        var lastVolume = this.yahooFinanceData[this.yahooFinanceData.length-1].volume;
+        if (firstVolume === "000" && lastVolume === "000") {
+            return false;
+        } else {
+            return true;
+        }
+    }, this.symbol);
+
+    /**
      * Get the (Simple) Mean Avarage
      *
      * @return     {Array} the Simple Mean Avarage
@@ -170,73 +198,136 @@
         };
     }
 
-    var scaleTo = function (scale, data) {
+    var scaleTo = function (scale, data, add) {
         switch (scale) {
             case undefined:
             case "days":
                 // Keep original day scale
                 return data;
             case "weeks":
-                return scaleToWeeks(data);
+                return scaleToWeeks(data, add);
             case "months":
-                return scaleToMonths(data);
+                return scaleToMonths(data, add);
             case "years":
-                return scaleToYears(data);
+                return scaleToYears(data, add);
         }
     };
 
-    var scaleToWeeks = function (data) {
+    var scaleToWeeks = function (data, add) {
         log.trace("Scaling data to week", data);
-        var scaledData = [];
-        var currentWeek = data[0][0].isoWeek();
-        var currentWeekIndex = 0;
-        $.each(data, function (index, value) {
-            var week = value[0].isoWeek();
-            if (week === currentWeek) {
-                scaledData[currentWeekIndex] = [value[0], value[1]];
-            } else {
-                currentWeek = week;
-                currentWeekIndex = currentWeekIndex + 1;
-                scaledData[currentWeekIndex] = [value[0], value[1]];
-            }
-        });
-        return scaledData;
+        console.time("scaleToWeeks");
+        if (add) {
+            var scaledData = [];
+            var currentWeek = data[0][0].isoWeek();
+            var currentWeekIndex = 0;
+            scaledData[currentWeekIndex] = [data[0][0], data[0][1]];
+            $.each(data, function (index, value) {
+                var week = value[0].isoWeek();
+                if (week === currentWeek) {
+                    scaledData[currentWeekIndex] = [value[0], scaledData[currentWeekIndex][1] + value[1]];
+                } else {
+                    currentWeek = week;
+                    currentWeekIndex = currentWeekIndex + 1;
+                    scaledData[currentWeekIndex] = [value[0], value[1]];
+                }
+            });
+            console.timeEnd("scaleToWeeks");
+            return scaledData;
+        } else {
+            var scaledData = [];
+            var currentWeek = data[0][0].isoWeek();
+            var currentWeekIndex = 0;
+            $.each(data, function (index, value) {
+                var week = value[0].isoWeek();
+                if (week === currentWeek) {
+                    scaledData[currentWeekIndex] = [value[0], value[1]];
+                } else {
+                    currentWeek = week;
+                    currentWeekIndex = currentWeekIndex + 1;
+                    scaledData[currentWeekIndex] = [value[0], value[1]];
+                }
+            });
+            console.timeEnd("scaleToWeeks");
+            return scaledData;
+        }
     };
 
-    var scaleToMonths = function (data) {
+    var scaleToMonths = function (data, add) {
         log.trace("Scaling data to month", data);
-        var scaledData = [];
-        var currentMonth = data[0][0].month();
-        var currentMonthIndex = 0;
-        $.each(data, function (index, value) {
-            var month = value[0].month();
-            if (month === currentMonth) {
-                scaledData[currentMonthIndex] = [value[0], value[1]];
-            } else {
-                currentMonth = month;
-                currentMonthIndex++;
-                scaledData[currentMonthIndex] = [value[0], value[1]];
-            }
-        });
-        return scaledData;
+        console.time("scaleToMonths");
+        if (add) {
+            var scaledData = [];
+            var currentMonth = data[0][0].month();
+            var currentMonthIndex = 0;
+            scaledData[currentMonthIndex] = [data[0][0], data[0][1]];
+            $.each(data, function (index, value) {
+                var month = value[0].month();
+                if (month === currentMonth) {
+                    scaledData[currentMonthIndex] = [value[0], scaledData[currentMonthIndex][1] + value[1]];
+                } else {
+                    currentMonth = month;
+                    currentMonthIndex++;
+                    scaledData[currentMonthIndex] = [value[0], value[1]];
+                }
+            });
+            console.timeEnd("scaleToMonths");
+            return scaledData;
+        } else {
+            var scaledData = [];
+            var currentMonth = data[0][0].month();
+            var currentMonthIndex = 0;
+            $.each(data, function (index, value) {
+                var month = value[0].month();
+                if (month === currentMonth) {
+                    scaledData[currentMonthIndex] = [value[0], value[1]];
+                } else {
+                    currentMonth = month;
+                    currentMonthIndex++;
+                    scaledData[currentMonthIndex] = [value[0], value[1]];
+                }
+            });
+            console.timeEnd("scaleToMonths");
+            return scaledData;
+        }
     };
 
-    var scaleToYears = function (data) {
+    var scaleToYears = function (data, add) {
         log.trace("Scaling data to year", data);
-        var scaledData = [];
-        var currentYear = data[0][0].year();
-        var currentYearIndex = 0;
-        $.each(data, function (index, value) {
-            var year = value[0].year();
-            if (year === currentYear) {
-                scaledData[currentYearIndex] = [value[0], value[1]];
-            } else {
-                currentYear = year;
-                currentYearIndex++;
-                scaledData[currentYearIndex] = [value[0], value[1]];
-            }
-        });
-        return scaledData;
+        console.time("scaleToYears");
+        if (add) {
+            var scaledData = [];
+            var currentYear = data[0][0].year();
+            var currentYearIndex = 0;
+            scaledData[currentYearIndex] = [data[0][0], data[0][1]];
+            $.each(data, function (index, value) {
+                var year = value[0].year();
+                if (year === currentYear) {
+                    scaledData[currentYearIndex] = [value[0], scaledData[currentYearIndex][1] + value[1]];
+                } else {
+                    currentYear = year;
+                    currentYearIndex++;
+                    scaledData[currentYearIndex] = [value[0], value[1]];
+                }
+            });
+            console.timeEnd("scaleToYears");
+            return scaledData;
+        } else {
+            var scaledData = [];
+            var currentYear = data[0][0].year();
+            var currentYearIndex = 0;
+            $.each(data, function (index, value) {
+                var year = value[0].year();
+                if (year === currentYear) {
+                    scaledData[currentYearIndex] = [value[0], value[1]];
+                } else {
+                    currentYear = year;
+                    currentYearIndex++;
+                    scaledData[currentYearIndex] = [value[0], value[1]];
+                }
+            });
+            console.timeEnd("scaleToYears");
+            return scaledData;
+        }
     };
 
     var adjustSplits = function (data) {
