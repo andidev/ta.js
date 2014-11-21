@@ -154,6 +154,66 @@
     };
 
     /**
+     * Calculate the RSI (Relative Strength Index)
+     *
+     *                  100
+     *    RSI = 100 - --------
+     *                 1 + RS
+     *
+     *    RS = Average Gain / Average Loss
+     *
+     * The very first calculations for average gain and average loss are simple 14 period averages.
+     *  - First Average Gain = Sum of Gains over the past 14 periods / 14.
+     *  - First Average Loss = Sum of Losses over the past 14 periods / 14
+     *
+     * The second, and subsequent, calculations are based on the prior averages and the current gain loss:
+     *  - Average Gain = [(previous Average Gain) x 13 + current Gain] / 14.
+     *  - Average Loss = [(previous Average Loss) x 13 + current Loss] / 14.
+     *
+     * For more info see http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi
+     *
+     * @param      {Number}   n
+     * @param      {Number}   from
+     * @param      {Number}   to
+     * @return     {TA} the RSI (Relative Strength Index)
+     */
+    TA.fn.rsi = function (n, from, to) {
+        if (from === undefined && to === undefined) {
+            from = 0;
+            to = this.array.length;
+        }
+
+        var gain = 0;
+        var loss = 0;
+        var rsi = [];
+        for(var i = from; i < to; i++) {
+            if (i === from) {
+                rsi[i - from] = null;
+            } else if (i <= n) {
+                rsi[i - from] = null;
+                if (this.array[i - 1] <= this.array[i]) {
+                    gain = gain + this.array[i] - this.array[i - 1];
+                } else {
+                    loss = loss + this.array[i - 1] - this.array[i];
+                }
+                if (i === n) {
+                    rsi[i - from] = 100 - 100 / (1 + gain / loss);
+                }
+            } else {
+                if (this.array[i - 1] <= this.array[i]) {
+                    gain = gain / n * (n - 1) + this.array[i] - this.array[i - 1];
+                    loss = loss / n * (n - 1);
+                } else {
+                    gain = gain / n * (n - 1);
+                    loss = loss / n * (n - 1) + this.array[i - 1] - this.array[i];
+                }
+                rsi[i - from] = 100 - 100 / (1 + gain / loss);
+            }
+        }
+        return TA(rsi);
+    };
+
+    /**
      * Calculate the Moving Average Convergence/Divergence
      *
      * @param      {Number}   n

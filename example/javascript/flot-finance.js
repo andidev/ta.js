@@ -83,6 +83,18 @@
     }, this.symbol);
 
     /**
+     * Get the RSI curve
+     *
+     * @return     {Array} the RSI curve
+     */
+    flotFinance.fn.getRsi = cached(function (n, scale, splitDetection) {
+        var data = this.getClosePrice(scale, splitDetection);
+        var priceTA = this.getPriceTA(scale, splitDetection);
+        data = convertToFlotFormat(priceTA.rsi(n).asArray(), data);
+        return data;
+    }, this.symbol);
+
+    /**
      * Get the (Simple) Mean Avarage
      *
      * @return     {Array} the Simple Mean Avarage

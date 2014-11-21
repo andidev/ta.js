@@ -148,6 +148,17 @@ function ViewModel() {
             align: "center"
         }
     });
+    self.showRsi = ko.observable(defaultBooleanValue(false, url.param("showRsi")));
+    self.rsi = ko.observable({
+        label: "RSI 14",
+        data: [],
+        color: "rgba(51, 120, 190, 1)",
+        shadowSize: 1,
+        lines: {
+            show: true,
+            lineWidth: 1
+        }
+    });
     self.enableSplitDetection = ko.observable(defaultBooleanValue(false, url.param("enableSplitDetection")));
     self.scale = ko.observable(defaultValue("days", url.param("scale")));
     self.scaleTimePeriodAll = ko.observable("days");
@@ -237,9 +248,32 @@ function ViewModel() {
         series: [],
         options: jQuery.extend(true, {}, self.commonPlotOptions)
     };
+    self.rsiPlotArgs = {
+        placeholder: $("#rsi-plot"),
+        series: [],
+        options: jQuery.extend(true, {
+            grid: {
+                markings: [{
+                        color: 'rgba(255, 0, 0, 0.5)',
+                        lineWidth: 1,
+                        yaxis: {from: 30, to: 30}
+                    }, {
+                        color: 'rgba(0, 255, 0, 0.5)',
+                        lineWidth: 1,
+                        yaxis: {from: 70, to: 70}
+                    }]
+            },
+            yaxis: {
+                tickColor: "transparent",
+                min: 0,
+                max: 100
+            }
+        }, self.commonPlotOptions)
+    };
     self.$plot;
     self.$macdPlot;
     self.$volumePlot;
+    self.$rsiPlot;
 
     self.percent = ko.observable(0);
     self.formattedPercent = ko.computed(function() {
@@ -429,6 +463,16 @@ function ViewModel() {
         }
         self.plot();
     };
+    self.toggleRsi = function() {
+        if (self.showRsi() === true) {
+            log.info("Hiding RSI");
+            self.showRsi(false);
+        } else {
+            log.info("Showing RSI");
+            self.showRsi(true);
+        }
+        self.plot();
+    };
     self.toggleSplitDetection = function() {
         if (self.enableSplitDetection() === false) {
             log.info("Enabling Split Detection");
@@ -614,6 +658,9 @@ function ViewModel() {
             if (self.showVolume() && self.hasVolume()) {
                 self.$volumePlot.clearSelection();
             }
+            if (self.showRsi()) {
+                self.$rsiPlot.clearSelection();
+            }
         }
     };
     self.syncSelectionInPlot = function(viewModel, event, ranges) {
@@ -624,6 +671,11 @@ function ViewModel() {
             if (event.currentTarget.id !== "volume-plot") {
                 if (self.showVolume() && self.hasVolume()) {
                     self.$volumePlot.setSelection(ranges, true);
+                }
+            }
+            if (event.currentTarget.id !== "rsi-plot") {
+                if (self.showRsi()) {
+                    self.$rsiPlot.setSelection(ranges, true);
                 }
             }
             if (event.currentTarget.id !== "macd-plot") {
@@ -856,6 +908,12 @@ function ViewModel() {
                         y: price
                     });
                 }
+                if (self.showRsi() && self.$rsiPlot !== undefined) {
+                    self.$rsiPlot.lockCrosshair({
+                        x: date,
+                        y: price
+                    });
+                }
                 if (self.showMacd() && self.$macdPlot !== undefined) {
                     self.$macdPlot.lockCrosshair({
                         x: date,
@@ -887,6 +945,9 @@ function ViewModel() {
             self.$plot.clearCrosshair();
             if (self.showVolume() && self.hasVolume() && self.$volumePlot !== undefined) {
                 self.$volumePlot.clearCrosshair();
+            }
+            if (self.showRsi() && self.$rsiPlot !== undefined) {
+                self.$rsiPlot.clearCrosshair();
             }
             if (self.showMacd() && self.$macdPlot !== undefined) {
                 self.$macdPlot.clearCrosshair();
@@ -966,6 +1027,11 @@ function ViewModel() {
             self.volumePlotArgs.series.push(self.volume());
         }
 
+        // Get RSI
+        self.rsi().data = self.flotFinanceSymbol().getRsi(14, self.computeScale(), self.enableSplitDetection());
+        log.info(self.flotFinanceSymbol().getRsi(14, self.computeScale(), self.enableSplitDetection()));
+        self.rsiPlotArgs.series.push(self.rsi());
+
         // Calculate MA Fastest
         self.maFastest().data = self.flotFinanceSymbol().getMaPrice(self.maFastestDatumPoints(), self.computeScale(), self.enableSplitDetection());
         self.plotArgs.series.push(self.maFastest());
@@ -1009,6 +1075,7 @@ function ViewModel() {
         self.plotMain();
         self.plotMacd();
         self.plotVolume();
+        self.plotRsi();
         var stop = moment().valueOf();
         var executionTime = stop - start;
         log.debug("Plotting took " + executionTime + " milliseconds");
@@ -1049,7 +1116,7 @@ function ViewModel() {
         } else {
             self.plotArgs.options.xaxis.tickColor = "transparent";
         }
-        if (self.showMacd() || (self.showVolume() && self.hasVolume())) {
+        if (self.showMacd() || (self.showVolume() && self.hasVolume()) || self.showRsi()) {
             self.plotArgs.options.xaxis.font = {color: "transparent"};
         } else {
             self.plotArgs.options.xaxis.font = null;
@@ -1083,7 +1150,7 @@ function ViewModel() {
     self.plotVolume = function() {
         log.info("Plotting Volume");
         self.updateVolumePlotAxisMinAndMax();
-        if (self.showMacd()) {
+        if (self.showMacd() || self.showRsi()) {
             self.volumePlotArgs.options.xaxis.font = {color: "transparent"};
         } else {
             self.volumePlotArgs.options.xaxis.font = null;
@@ -1113,6 +1180,33 @@ function ViewModel() {
         } else {
             $('#volume-plot').slideUp('fast', function() {
                 $('#volume-plot').html("");
+            });
+        }
+    };
+
+    self.plotRsi = function() {
+        log.info("Plotting RSI");
+        self.updateRsiPlotAxisMinAndMax();
+        if (self.showMacd()) {
+            self.rsiPlotArgs.options.xaxis.font = {color: "transparent"};
+        } else {
+            self.rsiPlotArgs.options.xaxis.font = null;
+        }
+        if (self.showRsi()) {
+            if (self.settings.showXaxisTicksInGrid) {
+                self.rsiPlotArgs.options.xaxis.tickColor = null;
+            } else {
+                self.rsiPlotArgs.options.xaxis.tickColor = "transparent";
+            }
+            log.info(self.rsi());
+            self.rsiPlotArgs.series = [self.rsi()];
+            $("#rsi-plot").css("margin-top", "-26px");
+            $("#rsi-plot").slideDown('fast', function() {
+                self.$rsiPlot = $.plot(this, self.rsiPlotArgs.series, self.rsiPlotArgs.options);
+            });
+        } else {
+            $('#rsi-plot').slideUp('fast', function() {
+                $('#rsi-plot').html("");
             });
         }
     };
@@ -1175,6 +1269,13 @@ function ViewModel() {
         self.volumePlotArgs.options.yaxes[0].min = 0;
         self.volumePlotArgs.options.yaxes[0].max = yaxisLeftMinMax.max;
     };
+
+    self.updateRsiPlotAxisMinAndMax = function() {
+        log.trace("updateRsiPlotAxisMinAndMax()");
+        // Update xaxis min/max
+        self.rsiPlotArgs.options.xaxis.min = self.fromDate();
+        self.rsiPlotArgs.options.xaxis.max = self.toDate();
+   };
 
     self.findClosestDatapoint = function(date) {
         log.trace("findClosestDatapoint()");

@@ -19,6 +19,11 @@ body {
     height: 200px;
     display: none;
 }
+#rsi-plot {
+    width: 100%;
+    height: 200px;
+    display: none;
+}
 #hover-popover {
     position: absolute;
     white-space: nowrap;
