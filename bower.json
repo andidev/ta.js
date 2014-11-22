@@ -1,0 +1,25 @@
+{
+    "name": "ta.js",
+    "version": "1.0.0-alpha.1",
+    "description": "JavaScript library for Technical Analysis",
+    "license": "Apache-2.0",
+    "authors": [{
+            "name": "Anders Steiner",
+            "email": "anders.steiner@gmail.com"
+        }],
+    "homepage": "https://github.com/andidev/ta.js",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/andidev/ta.js"
+    },
+    "main": "dist/ta.js",
+    "ignore": [
+        "**/.*",
+        "example",
+        "node_modules",
+        "bower_components",
+        "test"
+    ],
+    "dependencies": {},
+    "devDependencies": {}
+}
