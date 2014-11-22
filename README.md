@@ -2,18 +2,19 @@ ta.js
 ===================
 JavaScript library for Technical Analysis
 
-Supported Technical Analysis
+##Supported Technical Analysis
 - MA, Simple Moving Avarage
 - EMA, Exponential Moving Avarage
 - MACD, Moving Average Convergence/Divergence
 - RSI, Relative Strength Index
 
+##Getting Started
 Include ta.js manualy from `dist` folder or use [bower](http://bower.io/)
 ```bash
 bower install ta.js --save
 ```
 
-Examples
+###Examples
 ```javascript
 var result = TA([1, 2, 3, 1]).asArray();
 expect(result).toEqual([1, 2, 3, 1]);
