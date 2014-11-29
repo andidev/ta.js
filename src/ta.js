@@ -102,14 +102,14 @@
     };
 
     /**
-     * Calculate the (Simple) Moving Avarage
+     * Calculate the Simple Moving Avarage
      *
      * @param      {Number}   n
      * @param      {Number}   from
      * @param      {Number}   to
-     * @return     {TA} the (Simple) Moving Avarage
+     * @return     {TA} the Simple Moving Avarage
      */
-     TA.fn.ma = function (n, from, to) {
+     TA.fn.sma = function (n, from, to) {
         if (from === undefined && to === undefined) {
             from = 0;
             to = this.array.length;
@@ -126,12 +126,12 @@
     };
 
     /**
-     * Calculate the Exponentially (Weighted) Moving Average
+     * Calculate the Exponentially Weighted Moving Average
      *
      * @param      {Number}   n
      * @param      {Number}   from
      * @param      {Number}   to
-     * @return     {TA} the Exponentially (Weighted) Moving Average
+     * @return     {TA} the Exponentially Weighted Moving Average
      */
     TA.fn.ema = function (n, from, to) {
         if (from === undefined && to === undefined) {
@@ -145,7 +145,7 @@
             if (i < (n - 1)) {
                 ema[i - from] = null;
             } else if (i === (n - 1)) {
-                ema[i - from] = this.ma(n, i, i + 1).asArray()[0];
+                ema[i - from] = this.sma(n, i, i + 1).asArray()[0];
             } else {
                 ema[i - from] = alpha * this.array[i] + (1 - alpha) * ema[i - from - 1];
             }
@@ -177,40 +177,64 @@
      * @param      {Number}   to
      * @return     {TA} the RSI (Relative Strength Index)
      */
-    TA.fn.rsi = function (n, from, to) {
+    TA.fn.rsi = function (n, ema, from, to) {
         if (from === undefined && to === undefined) {
             from = 0;
             to = this.array.length;
         }
-
-        var gain = 0;
-        var loss = 0;
-        var rsi = [];
-        for(var i = from; i < to; i++) {
-            if (i === from) {
-                rsi[i - from] = null;
-            } else if (i <= n) {
-                rsi[i - from] = null;
-                if (this.array[i - 1] <= this.array[i]) {
-                    gain = gain + this.array[i] - this.array[i - 1];
+        var gain;
+        var loss;
+        var rsi;
+        var i;
+        if (ema === true) {
+            gain = [];
+            loss = [];
+            rsi = [null];
+            for (i = from + 1; i < to; i++) {
+                if (this.array[i] > this.array[i-1]) {
+                    gain[i-1] = this.array[i] - this.array[i-1];
+                    loss[i-1] = 0;
                 } else {
-                    loss = loss + this.array[i - 1] - this.array[i];
+                    gain[i-1] = 0;
+                    loss[i-1] = this.array[i-1] - this.array[i];
                 }
-                if (i === n) {
+            }
+            var gainEma = TA(gain).ema(n).asArray();
+            var lossEma = TA(loss).ema(n).asArray();
+            for (i = from + 1; i < to; i++) {
+                rsi[i - from] = 100 - 100 / (1 + gainEma[i] / lossEma[i]);
+            }
+            return TA(rsi);
+        } else {
+            gain = 0;
+            loss = 0;
+            rsi = [];
+            for (i = from; i < to; i++) {
+                if (i === from) {
+                    rsi[i - from] = null;
+                } else if (i <= n) {
+                    rsi[i - from] = null;
+                    if (this.array[i - 1] <= this.array[i]) {
+                        gain = gain + this.array[i] - this.array[i - 1];
+                    } else {
+                        loss = loss + this.array[i - 1] - this.array[i];
+                    }
+                    if (i === n) {
+                        rsi[i - from] = 100 - 100 / (1 + gain / loss);
+                    }
+                } else {
+                    if (this.array[i - 1] <= this.array[i]) {
+                        gain = gain / n * (n - 1) + this.array[i] - this.array[i - 1];
+                        loss = loss / n * (n - 1);
+                    } else {
+                        gain = gain / n * (n - 1);
+                        loss = loss / n * (n - 1) + this.array[i - 1] - this.array[i];
+                    }
                     rsi[i - from] = 100 - 100 / (1 + gain / loss);
                 }
-            } else {
-                if (this.array[i - 1] <= this.array[i]) {
-                    gain = gain / n * (n - 1) + this.array[i] - this.array[i - 1];
-                    loss = loss / n * (n - 1);
-                } else {
-                    gain = gain / n * (n - 1);
-                    loss = loss / n * (n - 1) + this.array[i - 1] - this.array[i];
-                }
-                rsi[i - from] = 100 - 100 / (1 + gain / loss);
             }
+            return TA(rsi);
         }
-        return TA(rsi);
     };
 
     /**
@@ -221,12 +245,12 @@
      * @param      {Number}   to
      * @return     {TA} the Moving Average Convergence/Divergence
      */
-    TA.fn.macd = function (nSlow, nFast, nSignal, from, to) {
-        if (nSlow === undefined) {
-            nSlow = 26;
-        }
+    TA.fn.macd = function (nFast, nSlow, nSignal, from, to) {
         if (nFast === undefined) {
             nFast = 12;
+        }
+        if (nSlow === undefined) {
+            nSlow = 26;
         }
         if (nSignal === undefined) {
             nSignal = 9;

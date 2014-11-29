@@ -65,6 +65,24 @@ expect(result.histogram.asArray()).toEqual([null, null, null, 0.1666666666666666
 var result = TA([44.3389, 44.0902, 44.1497, 43.6124, 44.3278, 44.8264, 45.0955, 45.4245, 45.8433, 46.0826, 45.8931, 46.0328, 45.614, 46.282, 46.282, 46.0028, 46.0328, 46.4116, 46.2222, 45.6439]).rsi(14);
 expect(result.asArray()).toEqual([ null, null, null, null, null, null, null, null, null, null, null, null, null, null, 70.53278948369497, 66.31856180517234, 66.54982993552767, 69.40630533884438, 66.35516905627179, 57.9748557143082 ]);
 ```
+
+## Development
+
+###Requirements
+- Node.js
+
+Install the node packages
+```bash
+npm install
+```
+
+Releasing a new version, simply just tag and push it to github, e.g
+```bash
+git tag 1.0.0-alpha.1
+git push origin 1.0.0-alpha.1
+```
+
+
 ## License
 
 Licensed under the Apache License, Version 2.0 (the "License");
