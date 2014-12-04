@@ -268,11 +268,11 @@
 
         var macd = this.ema(nFast, from, to).minus(this.ema(nSlow, from, to));
         var signal = macd.ema(nSignal, from, to);
-        var histogram = macd.minus(signal);
+        var divergence = macd.minus(signal);
         return {
             "macd": macd,
             "signal": signal,
-            "histogram": histogram
+            "divergence": divergence
         };
     };
 

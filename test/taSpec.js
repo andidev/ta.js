@@ -98,7 +98,7 @@ describe("ta.js", function() {
         var result = TA([1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 5, 6, 7, 8, 9, 12, 15, 8, 5, 2, 1, 1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 9, 13]).macd();
         expect(result.macd.asArray()).toEqual([null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -1.3403010826215067, -1.2936450756085116, -1.1625767501640452, -0.9668670735318954, -0.7227427733382523, -0.4434688313251325, -0.06006652540231805, 0.5600927345133044]);
         expect(result.signal.asArray()).toEqual([null, null, null, null, null, null, null, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.26806021652430134, -0.4731771883411434, -0.6110571007057237, -0.6822190952709581, -0.6903238308844171, -0.6409528309725603, -0.5247755698585118, -0.3078019089841486]);
-        expect(result.histogram.asArray()).toEqual([null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -1.0722408660972054, -0.8204678872673682, -0.5515196494583214, -0.28464797826093724, -0.03241894245383525, 0.1974839996474278, 0.46470904445619376, 0.867894643497453]);
+        expect(result.divergence.asArray()).toEqual([null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -1.0722408660972054, -0.8204678872673682, -0.5515196494583214, -0.28464797826093724, -0.03241894245383525, 0.1974839996474278, 0.46470904445619376, 0.867894643497453]);
       });
   });
 
@@ -107,7 +107,7 @@ describe("ta.js", function() {
         var result = TA([1, 2, 3, 4, 5, 6, 7, 6]).macd(3, 4, 2);
         expect(result.macd.asArray()).toEqual([null, null, null, 0.5, 0.5, 0.5, 0.5, 0.2999999999999998]);
         expect(result.signal.asArray()).toEqual([null, 0, 0, 0.3333333333333333, 0.4444444444444444, 0.4814814814814815, 0.49382716049382713, 0.36460905349794226]);
-        expect(result.histogram.asArray()).toEqual([null, null, null, 0.16666666666666669, 0.05555555555555558, 0.01851851851851849, 0.006172839506172867, -0.06460905349794244]);
+        expect(result.divergence.asArray()).toEqual([null, null, null, 0.16666666666666669, 0.05555555555555558, 0.01851851851851849, 0.006172839506172867, -0.06460905349794244]);
       });
   });
 
