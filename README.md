@@ -78,8 +78,8 @@ npm install
 
 Releasing a new version, simply just tag and push it to github, e.g
 ```bash
-git tag 1.0.0-alpha.3
-git push origin 1.0.0-alpha.3
+git tag 1.0.0-alpha.4
+git push origin 1.0.0-alpha.4
 ```
 
 
