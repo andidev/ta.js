@@ -1,4 +1,6 @@
-/*global module:false*/
+'use strict';
+/* global module:false */
+/* jshint indent:2 */
 module.exports = function(grunt) {
 
   // Project configuration.
@@ -15,11 +17,12 @@ module.exports = function(grunt) {
     // Task configuration.
     jshint: {
       options: {
-        jshintrc: '.jshintrc'
+        jshintrc: '.jshintrc',
+        reporter: require('jshint-stylish')
       },
       gruntfile: ['Gruntfile.js'],
       src: ['src/**/*.js'],
-      test: ['test/**/*.js'],
+      test: ['test/**/*.js']
     },
     jasmine : {
       src : 'src/**/*.js',

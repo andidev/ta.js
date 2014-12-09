@@ -4,6 +4,7 @@
  * Copyright (c) 2014 Anders Steiner; Licensed Apache-2.0
  */
 
+'use strict';
 (function() {
 
     // helpers
@@ -12,16 +13,6 @@
     // test if array
     var isArray = Array.isArray || function(arg) {
         return toString.call(arg) === '[object Array]';
-    };
-
-    // test if function
-    var isFunction = function(arg) {
-        return toString.call(arg) === '[object Function]';
-    };
-
-    // test if number and not NaN
-    var isNumber = function(arg) {
-        return toString.call(arg) === '[object Number]' && !isNaN(arg);
     };
 
     var TA = function(arg1) { // core constructor
@@ -62,6 +53,9 @@
             }
             var sum = 0;
             for(var i = from; i < to; i++) {
+                if (this.array[i] === null) {
+                    throw 'Cannot sum array from index ' + from + ' to ' + to + ' since value is null at index ' + i + ', array = ' + this.array;
+                }
                 sum += this.array[i];
             }
             return sum;
@@ -101,6 +95,9 @@
             }
             var sum = 0;
             for(var i = from; i < to; i++) {
+                if (this.array[i] === null) {
+                    throw 'Cannot calculate array avarage from index ' + from + ' to ' + to + ' since value is null at index ' + i + ', array = ' + this.array;
+                }
                 sum += this.array[i];
             }
             return sum/(to-from);
@@ -110,22 +107,32 @@
     /**
      * Calculate the Simple Moving Avarage
      *
+     * SMA = sum of n periods / n
+     *
+     * For more info see http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_averages
+     *
      * @param      {Number}   n
      * @param      {Number}   from
      * @param      {Number}   to
      * @return     {TA} the Simple Moving Avarage
      */
-     TA.fn.sma = function (n, from, to) {
+    TA.fn.sma = function (n, from, to) {
         if (from === undefined && to === undefined) {
             from = 0;
             to = this.array.length;
         }
         var ma = [];
+        var push = 0;
         for(var i = from; i < to; i++) {
-            if (i < (n - 1)) {
+            if (i < (n - 1 + push)) {
                 ma[i - from] = null;
-            } else {
+                if (this.array[i] === null) {
+                    push++;
+                }
+            } else if (ma[i - from - 1] === null || (i - from - 1) < 0) {
                 ma[i - from] = this.sum(i - (n - 1), i + 1) / n;
+            } else {
+                ma[i - from] = ma[i - from - 1] + (this.array[i] - this.array[i - n]) / n;
             }
         }
         return TA(ma);
@@ -133,6 +140,12 @@
 
     /**
      * Calculate the Exponentially Weighted Moving Average
+     *
+     * alpha = 2 / (n + 1)
+     *
+     * EMA = (Close - EMA(previous day)) x alpha + EMA(previous day)
+     *
+     * For more info see http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_averages
      *
      * @param      {Number}   n
      * @param      {Number}   from
@@ -147,13 +160,18 @@
 
         var alpha = 2 / (n + 1);
         var ema = [];
+        var push = 0;
         for(var i = from; i < to; i++) {
-            if (i < (n - 1)) {
+            if (i < (n - 1 + push)) {
                 ema[i - from] = null;
-            } else if (i === (n - 1)) {
+                if (this.array[i] === null) {
+                    push++;
+                }
+            } else if (ema[i - from - 1] === null || (i - from - 1) < 0) {
                 ema[i - from] = this.sma(n, i, i + 1).asArray()[0];
+                //25  - 34
             } else {
-                ema[i - from] = alpha * this.array[i] + (1 - alpha) * ema[i - from - 1];
+                ema[i - from] = (this.array[i] - ema[i - from - 1]) * alpha + ema[i - from - 1];
             }
         }
         return TA(ema);
@@ -193,22 +211,30 @@
         var rsi;
         var i;
         if (ema === true) {
-            gain = [];
-            loss = [];
+            gain = [null];
+            loss = [null];
             rsi = [null];
             for (i = from + 1; i < to; i++) {
                 if (this.array[i] > this.array[i-1]) {
-                    gain[i-1] = this.array[i] - this.array[i-1];
-                    loss[i-1] = 0;
+                    gain[i - from] = this.array[i] - this.array[i-1];
+                    loss[i - from] = 0;
                 } else {
-                    gain[i-1] = 0;
-                    loss[i-1] = this.array[i-1] - this.array[i];
+                    gain[i - from] = 0;
+                    loss[i - from] = this.array[i-1] - this.array[i];
                 }
             }
-            var gainEma = TA(gain).ema(n).asArray();
-            var lossEma = TA(loss).ema(n).asArray();
+            var gainEma = TA(gain.slice(1, gain.length)).ema(n).asArray();
+            var lossEma = TA(loss.slice(1, loss.length)).ema(n).asArray();
+            gainEma.unshift(null);
+            lossEma.unshift(null);
             for (i = from + 1; i < to; i++) {
-                rsi[i - from] = 100 - 100 / (1 + gainEma[i] / lossEma[i]);
+                if (gainEma === null || lossEma[i] === null) {
+                    rsi[i - from] = null;
+                } else if (lossEma[i] === 0) {
+                    rsi[i - from] = 100;
+                } else {
+                    rsi[i - from] = 100 - 100 / (1 + gainEma[i] / lossEma[i]);
+                }
             }
             return TA(rsi);
         } else {
@@ -270,12 +296,13 @@
         var signal = macd.ema(nSignal, from, to);
         var divergence = macd.minus(signal);
         return {
-            "macd": macd,
-            "signal": signal,
-            "divergence": divergence
+            'macd': macd,
+            'signal': signal,
+            'divergence': divergence
         };
     };
 
     // expose the library
     window.TA = TA;
 })();
+
